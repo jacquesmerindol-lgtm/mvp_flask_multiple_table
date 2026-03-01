@@ -1,0 +1,55 @@
+{% from "bootstrap5/form.html" import render_form %}
+{% extends "base.html" %}
+
+{% block title %}{{ livre.nom_livre }} — MVP Flask Multiple Table{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>{{ livre.nom_livre }}</h2>
+
+  <div>
+    <!-- Bouton Modifier (GET) -->
+    <a href="{{ url_for('livres.update_ui', id_livre=livre.id_livre) }}"
+      class="btn btn-warning">
+      ✏️ Modifier
+    </a>
+
+    <!-- Bouton Supprimer (POST) -->
+    <form method="POST"
+          action="{{ url_for('livres.delete_ui', id_livre=livre.id_livre) }}"
+          class="d-inline">
+      {{ form_delete.hidden_tag() }}
+      <button type="submit" class="btn btn-danger">
+        🗑️ Supprimer
+      </button>
+    </form>
+  </div>
+  
+</div>
+
+<div id="detailView">
+  <p><strong>ID :</strong> {{ livre.id_livre }}</p>
+  <p><strong>Numéro :</strong> {{ livre.numero_livre or '-' }}</p>
+  <p><strong>Périodes :</strong> {{ ', '.join(livre.periode_recettes) }}</p>
+  <p><strong>Robot :</strong> {{ livre.nom_robot }}</p>
+
+  <div class="mt-4">
+    <a href="{{ url_for('livres.index') }}" class="btn btn-secondary">⬅ Retour</a>
+  </div>
+</div>
+
+<div id="editForm" class="d-none mt-3">
+  <h5>Modifier le livre</h5>
+
+  {{ render_form(
+      form_edit,
+      action=url_for('livres.update_ui', id_livre=livre.id_livre),
+      method='POST'
+  ) }}
+
+  <button type="button" id="discardBtn" class="btn btn-secondary mt-2">
+    ❌ Annuler
+  </button>
+</div>
+
+{% endblock %}

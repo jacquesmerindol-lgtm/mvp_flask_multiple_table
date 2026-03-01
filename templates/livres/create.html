@@ -1,0 +1,17 @@
+{% from "bootstrap5/form.html" import render_form %}
+{% extends "base.html" %}
+
+{% block title %}Créer un livre — MVP Flask Multiple Table{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h2>Créer un nouveau livre</h2>
+  <p class="text-muted">Remplissez le formulaire ci‑dessous pour ajouter un livre de cuisine.</p>
+</div>
+
+<!-- {{ render_form(form, action=url_for('livres.create'), method='POST') }} -->
+
+{{ render_form(form) }}
+
+<a href="{{ url_for('livres.index') }}" class="btn btn-secondary mt-3">⬅ Retour</a>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Résultats de la structuration</h2>
+
+    <!-- Boutons d'action -->
+    <div class="mb-4">
+
+        <!-- Relancer la structuration -->
+        <form action="{{ url_for('ocr.structuration_ui') }}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-success me-2">
+                🔁 Relancer la structuration
+            </button>
+        </form>
+
+        <!-- Retour accueil -->
+        <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+            🏠 Retour à l'accueil
+        </a>
+
+        <!-- Choisir un livre pour enregistrer -->
+        <a href="{{ url_for('ocr.select_livre_ui') }}" class="btn btn-warning">
+            📚 Choisir un livre et enregistrer
+        </a>
+
+    </div>
+
+    {% for item in results %}
+    <div class="card mb-4 shadow-sm">
+
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                Recette structurée — {{ item.nom_recette or "Sans nom" }}
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <p><strong>Fichier source :</strong> {{ item.lien_fichier }}</p>
+            <p><strong>Nombre de personnes :</strong> {{ item.nombre_personnes }}</p>
+
+            <p>
+                <strong>Temps :</strong><br>
+                Préparation : {{ item.temps_preparation }}<br>
+                Cuisson : {{ item.temps_cuisson }}<br>
+                Repos : {{ item.temps_repos }}
+            </p>
+
+            <!-- Ingrédients -->
+            <details open class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Ingrédients ({{ item.ingredients|length }})
+                </summary>
+                <pre class="bg-light p-3 rounded small mt-2"
+                     style="max-height: 10rem; overflow-y: auto; white-space: pre-wrap;">
+{% for ing in item.ingredients %}
+- {{ ing }}
+{% endfor %}
+                </pre>
+            </details>
+
+            <!-- Étapes générales -->
+            <details open class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Étapes générales ({{ item.etapes|length }})
+                </summary>
+                <pre class="bg-light p-3 rounded small mt-2"
+                     style="max-height: 12rem; overflow-y: auto; white-space: pre-wrap;">
+{% for step in item.etapes %}
+- {{ step }}
+{% endfor %}
+                </pre>
+            </details>
+
+            <!-- Étapes Companion -->
+            <details open class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Étapes Companion ({{ item.etapes_companion|length }})
+                </summary>
+                <pre class="bg-light p-3 rounded small mt-2"
+                     style="max-height: 12rem; overflow-y: auto; white-space: pre-wrap;">
+{% for step in item.etapes_companion %}
+- {{ step }}
+{% endfor %}
+                </pre>
+            </details>
+
+            <!-- Astuces -->
+            <details open class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Astuces
+                </summary>
+                <pre class="bg-light p-3 rounded small mt-2"
+                     style="max-height: 8rem; overflow-y: auto; white-space: pre-wrap;">
+{{ item.astuces }}
+                </pre>
+            </details>
+
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

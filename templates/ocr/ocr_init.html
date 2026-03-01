@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "bootstrap5/form.html" import render_form %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Initialisation du traitement OCR</h2>
+      <p class="text-muted">Saisissez les chemins des images à traiter et choisissez si le LLM doit être utilisé.</p>
+
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+
+          {{ render_form(
+              form,
+              action=url_for('ocr.init_ui'),
+              method='POST',
+              extra_classes="mt-3"
+          ) }}
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

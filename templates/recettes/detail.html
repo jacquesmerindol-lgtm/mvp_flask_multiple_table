@@ -1,0 +1,83 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends "base.html" %}
+
+{% block title %}{{ recette.nom_recette }} — MVP Flask Multiple Table{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>{{ recette.nom_recette }}</h2>
+
+  <div>
+    <!-- Bouton Modifier (GET) -->
+    <a href="{{ url_for('recettes.update_ui', id_recette=recette.id_recette) }}"
+      class="btn btn-primary me-2">
+      ✏️ Modifier
+    </a>
+
+    <!-- Suppression via POST -->
+    <form method="POST"
+          action="{{ url_for('recettes.delete_ui', id_recette=recette.id_recette) }}"
+          class="d-inline">
+      {{ form_delete.hidden_tag() }}
+      <button class="btn btn-danger" id="deleteBtn">🗑️ Supprimer</button>
+    </form>
+  </div>
+</div>
+
+<!-- Vue détail -->
+<div id="detailView">
+  <p><strong>ID :</strong> {{ recette.id_recette }}</p>
+  <p><strong>Type :</strong> {{ recette.type_recette }}</p>
+  <p><strong>Personnes :</strong> {{ recette.nombre_personnes }}</p>
+  <p><strong>Préparation :</strong> {{ recette.duree_preparation }} min</p>
+  <p><strong>Cuisson :</strong> {{ recette.duree_cuisson }} min</p>
+  <p><strong>Repos :</strong> {{ recette.duree_repos }} min</p>
+
+  {% if recette.liste_ingredients %}
+    <h5>Ingrédients</h5>
+    <ul class="list-group list-group-flush">
+      {% for ing in recette.liste_ingredients %}
+        <li class="list-group-item">{{ ing.quantite }} {{ ing.unite }} — {{ ing.ingredient }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if recette.instructions %}
+    <h5>Instructions</h5>
+    <p>{{ recette.instructions | e }}</p>
+  {% endif %}
+
+  {% if recette.astuce %}
+    <div class="alert alert-info mt-2">
+      💡 <strong>Astuce :</strong> {{ recette.astuce }}
+    </div>
+  {% endif %}
+
+  <p><strong>Livre référent :</strong>
+    <a href="{{ url_for('livres.detail', id_livre=recette.id_livre_reference) }}">
+      {{ livre.nom_livre }}
+    </a>
+  </p>
+
+  <div class="mt-4">
+    <a href="{{ url_for('recettes.index') }}" class="btn btn-secondary">⬅ Retour</a>
+  </div>
+</div>
+
+<!-- Formulaire édition -->
+<div id="editForm" class="d-none mt-3">
+  <h5>Modifier la recette</h5>
+
+  {{ render_form(
+      form_edit,
+      action=url_for('recettes.update_ui', id_recette=recette.id_recette),
+      method='POST'
+  ) }}
+
+  <button type="button" id="discardBtn" class="btn btn-secondary mt-2">
+    ❌ Annuler
+  </button>
+</div>
+
+{% endblock %}

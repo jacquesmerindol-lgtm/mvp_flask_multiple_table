@@ -1,0 +1,8 @@
+Flask
+WTForms
+Flask-WTF
+bootstrap-flask
+SQLAlchemy
+pydantic
+pydantic-settings
+python-dotenv

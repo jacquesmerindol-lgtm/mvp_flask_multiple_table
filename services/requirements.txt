@@ -1,0 +1,10 @@
+paddleocr
+python-docx
+markdownify
+
+langchain<1.0.0
+langchain-core
+langchain-openai
+langsmith
+paddlex[ocr]
+pdf2image

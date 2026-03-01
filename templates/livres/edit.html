@@ -1,0 +1,18 @@
+{% from "bootstrap5/form.html" import render_form %}
+{% extends "base.html" %}
+
+{% block title %}Modifier {{ livre.nom_livre }} — MVP Flask Multiple Table{% endblock %}
+
+{% block content %}
+<h2>Modifier le livre : {{ livre.nom_livre }}</h2>
+
+{{ render_form(
+    form,
+    action=url_for('livres.update_ui', id_livre=livre.id_livre),
+    method='POST'
+) }}
+
+<a href="{{ url_for('livres.detail', id_livre=livre.id_livre) }}" class="btn btn-secondary mt-3">
+  ⬅ Retour
+</a>
+{% endblock %}
