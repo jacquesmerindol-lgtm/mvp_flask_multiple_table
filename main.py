@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 
 from config import get_settings
 from database import Base, engine
@@ -10,10 +10,15 @@ from routes import debug_livres_bp, debug_recettes_bp
 from routes.livres import livres_bp
 from routes.recettes import recettes_bp
 from services.ocr.routes import bp as ocr_bp
+from services.list_ingredients.routes import ingredients_bp
+from services.list_ingredients_simple.routes import ingredients_bp_simple
+
 # Importer les formulaires pour que render_form() fonctionne
 import forms  # noqa: F401
 
 from flask_bootstrap import Bootstrap5
+
+import json
 
 
 def create_app():
@@ -37,11 +42,25 @@ def create_app():
     app.register_blueprint(debug_livres_bp) 
     app.register_blueprint(debug_recettes_bp)
     app.register_blueprint(ocr_bp) # ← obligatoire
+    app.register_blueprint(ingredients_bp)
+    app.register_blueprint(ingredients_bp_simple)
 
     # Page d'accueil
     @app.route("/")
     def index():
         return render_template("index.html")
+
+    @app.template_filter("from_json")
+    def from_json_filter(value):
+        try:
+            return json.loads(value)
+        except:
+            return []
+        
+    @app.route("/reset_session")
+    def reset_session():
+        session.clear()
+        return "Session reset"
 
     return app
 
