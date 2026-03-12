@@ -1,12 +1,25 @@
 {% extends "base.html" %}
-{% from "bootstrap5/form.html" import render_form %}
-{% block content %}
 
+{% block content %}
 <div class="container mt-4">
 
     <h2 class="mb-4">Choisir un livre pour enregistrer les recettes</h2>
 
-    {{ render_form(form) }}
+    <form action="{{ url_for('ocr.select_livre_ui') }}" method="POST" class="mt-3">
+
+        <div class="mb-3">
+            <label for="id_livre" class="form-label">Choisir un livre</label>
+            <select class="form-select" id="id_livre" name="id_livre" required>
+                <option value="" disabled selected>-- Sélectionner --</option>
+
+                {% for id, label in livres %}
+                    <option value="{{ id }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer les recettes</button>
+    </form>
 
     <div class="mt-3">
         <a href="{{ url_for('ocr.structuration_ui') }}" class="btn btn-secondary">
@@ -15,5 +28,4 @@
     </div>
 
 </div>
-
 {% endblock %}

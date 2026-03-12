@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "bootstrap5/form.html" import render_form %}
 
 {% block content %}
 <div class="container mt-4">
@@ -23,7 +24,7 @@
     </form>
   </div>
 
-  {% for item in results.root %}
+  {% for item in results %}
   <div class="card shadow-sm mt-4">
     <div class="card-body">
 

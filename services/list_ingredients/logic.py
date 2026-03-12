@@ -1,5 +1,5 @@
 import json
-from services.list_ingredients.schema import RecetteSelection, Ingredient
+from services.list_course.schema import RecetteSelection, Ingredient
 from services.list_ingredients.crud import get_recettes_full_by_ids
 
 # services/list_ingredients/utils.py
@@ -26,7 +26,7 @@ def build_selection_pydantic(selected_data: dict):
         try:
             ingredients_raw = json.loads(row.liste_ingredients)
         except:
-            ingredients_raw = []
+            ingredients_raw = row.liste_ingredients
 
         ingredients = [Ingredient(**ing) for ing in ingredients_raw]
 
@@ -41,5 +41,4 @@ def build_selection_pydantic(selected_data: dict):
                 liste_ingredients=ingredients,
             )
         )
-
     return result

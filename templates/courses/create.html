@@ -1,0 +1,19 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends "base.html" %}
+
+{% block title %}Créer une liste de course — MVP Flask Multiple Table{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h2>Créer une nouvelle liste de course</h2>
+  <p class="text-muted">Remplissez le formulaire ci‑dessous pour ajouter une liste de course.</p>
+</div>
+
+{{ render_form(form, action=url_for('courses.create'), method='POST') }}
+
+<a href="{{ url_for('courses.index') }}" class="btn btn-secondary mt-3">
+  ⬅ Retour
+</a>
+
+{% endblock %}

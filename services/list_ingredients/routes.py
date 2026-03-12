@@ -134,10 +134,10 @@ def update_selection():
 
 
 from services.list_ingredients.logic import build_selection_pydantic
-from flask import jsonify
+from flask import jsonify 
 
-@ingredients_bp.route("/select/export")
-def export_for_llm():
+@ingredients_bp.route("/select/export/json", methods=["GET"])
+def export_JSON_for_llm():
     selected_data = session.get("liste_recettes", {})
     payload = build_selection_pydantic(selected_data)
 
@@ -145,5 +145,12 @@ def export_for_llm():
     payload_dicts = [item.model_dump() for item in payload] 
     
     return jsonify(payload_dicts)
+
+@ingredients_bp.route("/select/export/pydantic", methods=["GET"])
+def export_pydantic_for_llm():
+    selected_data = session.get("liste_recettes", {})
+    payload = build_selection_pydantic(selected_data)
+    
+    return (payload)
 
 

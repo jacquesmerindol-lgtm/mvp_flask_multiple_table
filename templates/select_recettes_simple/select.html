@@ -153,11 +153,11 @@
                     <td>{{ r.type_recette }}</td>
 
                     <td>
-                      {% set ingredients = r.liste_ingredients | from_json %}
+                      {% set ingredients = r.liste_ingredients %}
                       {% if ingredients %}
                         <span class="badge bg-secondary"
                               data-bs-toggle="tooltip"
-                              title="{% for ing in ingredients %}{{ ing.quantite }} {{ ing.ingredient }}{% if not loop.last %}, {% endif %}{% endfor %}">
+                              title="{% for ing in ingredients %}{{ ing.quantite }} {{ ing.nom }}{% if not loop.last %}, {% endif %}{% endfor %}">
                           {{ ingredients | length }} ingrédients
                         </span>
                       {% else %}

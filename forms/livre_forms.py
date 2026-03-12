@@ -10,7 +10,6 @@ from config import get_settings
 
 settings = get_settings()
 
-
 class LivreCreateForm(FlaskForm):
     nom_livre = StringField("Nom du livre", validators=[DataRequired()])
     numero_livre = StringField("Numéro (optionnel)")

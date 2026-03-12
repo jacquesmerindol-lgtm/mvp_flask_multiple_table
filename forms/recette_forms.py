@@ -3,7 +3,7 @@ from wtforms import (
     StringField, HiddenField, SelectField,
     TextAreaField, IntegerField, SubmitField
 )
-from wtforms.validators import DataRequired,ValidationError
+from wtforms.validators import DataRequired,ValidationError, Optional
 
 from config import get_settings
 from database import get_db
@@ -39,9 +39,9 @@ class RecetteCreateForm(FlaskForm):
 
     nombre_personnes = IntegerField("Personnes", validators=[DataRequired()])
 
-    duree_preparation = IntegerField("Préparation (min)")
-    duree_cuisson = IntegerField("Cuisson (min)")
-    duree_repos = IntegerField("Repos (min)")
+    duree_preparation = StringField("Préparation (min)", validators=[DataRequired()])
+    duree_cuisson = StringField("Cuisson (min)")
+    duree_repos = StringField("Repos (min)")
 
     liste_ingredients = TextAreaField(
         "Ingrédients (JSON)",
@@ -86,17 +86,16 @@ class RecetteUpdateForm(FlaskForm):
 
     nombre_personnes = IntegerField("Personnes", validators=[DataRequired()])
 
-    duree_preparation = IntegerField("Préparation (min)")
-    duree_cuisson = IntegerField("Cuisson (min)")
-    duree_repos = IntegerField("Repos (min)")
+    duree_preparation = StringField("Préparation (min)", validators=[DataRequired()])
+    duree_cuisson = StringField("Cuisson (min)")
+    duree_repos = StringField("Repos (min)")
 
     liste_ingredients = TextAreaField(
-        "Ingrédients (JSON)",
-        render_kw={"rows": 5},
+        "Ingrédients (JSON)", render_kw={"rows": 5},
         description='Format: [{"quantite": "200g", "unite": "g", "ingredient": "poulet"}]'
     )
 
-    instructions = TextAreaField("Instructions", render_kw={"rows": 4})
+    instructions = TextAreaField("Instructions",render_kw={"rows": 4})   # ← hauteur du textarea
     astuce = TextAreaField("Astuce", render_kw={"rows": 2})
 
     id_livre_reference = SelectField(

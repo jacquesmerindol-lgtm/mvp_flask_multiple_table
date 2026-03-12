@@ -255,18 +255,30 @@ from markdownify import markdownify as md
 from langchain_openai import ChatOpenAI
 from pdf2image import convert_from_path
 
+from pydantic import BaseModel, Field, RootModel
 
+# ======================
+# MODÈLES PYDANTIC
+# ======================
 # Typings
 ImageFilePaths = List[str]
 
 
-class OCRResult(TypedDict):
-    image_path: str
-    md_data: str
-    enhanced_md: str  # Markdown amélioré par LLM (optionnel)
+# class OCRResult(TypedDict):
+#     image_path: str
+#     md_data: str
+#     enhanced_md: str  # Markdown amélioré par LLM (optionnel)
 
 
-OCRResults = List[OCRResult]
+# OCRResults = List[OCRResult]
+
+class OCRResult(BaseModel):
+    image_path: str = ""
+    md_data: str = ""
+    enhanced_md: str = Field(default="", description="Markdown amélioré par LLM (optionnel)")
+
+class OCRResults(RootModel[List[OCRResult]]):
+    pass
 
 
 # ---------------------------------------------------------
@@ -324,6 +336,11 @@ class PaddleOCRProcessor:
         self.use_temperature = use_temperature
 
         self.pipeline = self._init_pipeline()
+            
+        # Propriétés internes - toujours initialisées
+        self._input_model: ImageFilePaths = []
+        self._output_model: OCRResults = []
+
 
     # ---------------------------------------------------------
     #  Logger centralisé
@@ -424,8 +441,9 @@ class PaddleOCRProcessor:
     #  Run OCR pipeline
     # ---------------------------------------------------------
     @safe(default_return=[])
-    def run_pipeline(self, image_paths: ImageFilePaths) -> OCRResults:
-        results: OCRResults = []
+    def run(self, image_paths: ImageFilePaths) -> OCRResults:
+        self._input_model = image_paths
+        collected = []   # liste Python temporaire
 
         for image_path in image_paths:
             # PP-StructureV3 accepte directement les PDF et les images
@@ -448,22 +466,30 @@ class PaddleOCRProcessor:
 
             markdown_texts = self.safe_concatenate_markdown(markdown_list)
 
-            result_item = {
-                "image_path": image_path,
-                "md_data": markdown_texts,
-            }
+            result_item = OCRResult(
+                image_path=image_path,
+                md_data=markdown_texts,
+                enhanced_md=self.enhance_with_llm(image_path, markdown_texts)
+                if self.use_llm else ""
+            )
 
-            if self.use_llm:
-                enhanced = self.enhance_with_llm(image_path, markdown_texts)
-                result_item["enhanced_md"] = enhanced
-
-            results.append(result_item)
-
-        return results
+            collected.append(result_item)
+        
+        # 🔥 Conversion finale en objet Pydantic
+        self._output_model = OCRResults(root=collected)
+        return self._output_model
 
     # ---------------------------------------------------------
     #  LLM Enhancement (gère images et PDF)
     # ---------------------------------------------------------
+    
+    def typographize_apostrophes(self, text: str) -> str:
+        """Remplace les apostrophes ASCII ' par des apostrophes typographiques ’."""
+        if not isinstance(text, str):
+            return text
+        return text.replace("'", "’")
+
+    
     @safe(default_return="")
     def enhance_with_llm(self, input_path: str, markdown_texts: str) -> str:
         """
@@ -482,7 +508,8 @@ class PaddleOCRProcessor:
             "role": "system",
             "content": (
                 "Tu es un assistant expert en structuration de documents OCR.\n"
-                "Tu dois renvoyer un document markdown propre, structuré, cohérent.\n\n"
+                "Tu dois renvoyer un document markdown propre, structuré, cohérent.\n"
+                "Les apostrophes pour la liaison des mots sont obligatoirement  le caractère ’, ne jamais utilisé ' quidoit être réservé pour les listes python.\n\n"
                 "⚠️ RÈGLE ABSOLUE SUR LES TABLEAUX :\n"
                 "- Ne jamais modifier la structure.\n"
                 "- Ne jamais changer le nombre de lignes/colonnes.\n"
@@ -522,6 +549,7 @@ class PaddleOCRProcessor:
                 }
 
                 response = llm.invoke([system_msg, user_msg])
+                response.content = self.typographize_apostrophes(response.content)
                 enhanced_chunks.append(response.content)
 
             return "\n\n".join(enhanced_chunks)
@@ -550,6 +578,7 @@ class PaddleOCRProcessor:
             }
 
             response = llm.invoke([system_msg, user_msg])
+            response.content = self.typographize_apostrophes(response.content)
             return response.content
 
     # ---------------------------------------------------------

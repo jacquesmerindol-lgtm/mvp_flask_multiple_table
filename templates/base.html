@@ -23,6 +23,7 @@
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a class="nav-link" href="{{ url_for('livres.index') }}">Livres</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('recettes.index') }}">Recettes</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('courses.index') }}">Liste</a></li>
         </ul>
       </div>
     </div>
@@ -45,8 +46,6 @@
 
   <!-- Bootstrap JS -->
   {{ bootstrap.load_js() }} 
-   
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   {% block scripts %}{% endblock %}

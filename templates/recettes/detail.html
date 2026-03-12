@@ -30,22 +30,28 @@
   <p><strong>ID :</strong> {{ recette.id_recette }}</p>
   <p><strong>Type :</strong> {{ recette.type_recette }}</p>
   <p><strong>Personnes :</strong> {{ recette.nombre_personnes }}</p>
-  <p><strong>Préparation :</strong> {{ recette.duree_preparation }} min</p>
-  <p><strong>Cuisson :</strong> {{ recette.duree_cuisson }} min</p>
-  <p><strong>Repos :</strong> {{ recette.duree_repos }} min</p>
+  <p><strong>Préparation :</strong> {{ recette.duree_preparation }} </p>
+  <p><strong>Cuisson :</strong> {{ recette.duree_cuisson }} </p>
+  <p><strong>Repos :</strong> {{ recette.duree_repos }} </p>
 
   {% if recette.liste_ingredients %}
     <h5>Ingrédients</h5>
     <ul class="list-group list-group-flush">
       {% for ing in recette.liste_ingredients %}
-        <li class="list-group-item">{{ ing.quantite }} {{ ing.unite }} — {{ ing.ingredient }}</li>
+        <li class="list-group-item">
+          {{ ing.ingredient }}: {{ ing.quantite }} — {{ ing.unite }}
+        </li>
       {% endfor %}
     </ul>
   {% endif %}
 
   {% if recette.instructions %}
     <h5>Instructions</h5>
-    <p>{{ recette.instructions | e }}</p>
+    <ul class="list-group list-group-flush">
+      {% for step in recette.instructions %}
+        <li class="list-group-item">{{ step }}</li>
+      {% endfor %}
+    </ul>
   {% endif %}
 
   {% if recette.astuce %}

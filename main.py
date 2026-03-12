@@ -9,9 +9,13 @@ from database import Base, engine
 from routes import debug_livres_bp, debug_recettes_bp
 from routes.livres import livres_bp
 from routes.recettes import recettes_bp
+from routes.courses import courses_bp
+
 from services.ocr.routes import bp as ocr_bp
 from services.list_ingredients.routes import ingredients_bp
 from services.list_ingredients_simple.routes import ingredients_bp_simple
+from services.list_course.routes import list_course_bp
+
 
 # Importer les formulaires pour que render_form() fonctionne
 import forms  # noqa: F401
@@ -44,6 +48,8 @@ def create_app():
     app.register_blueprint(ocr_bp) # ← obligatoire
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(ingredients_bp_simple)
+    app.register_blueprint(courses_bp)
+    app.register_blueprint(list_course_bp)
 
     # Page d'accueil
     @app.route("/")

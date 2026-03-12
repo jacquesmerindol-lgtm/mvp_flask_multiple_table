@@ -24,6 +24,12 @@ def index():
     sort = request.args.get("sort", "id_livre")
     order = request.args.get("order", "asc")
 
+    # Whitelist de tri (optionnel mais recommandé)
+    allowed_sort = {"id_livre", "nom_livre", "numero_livre", "periode_recettes", "nom_robot"}
+    if sort not in allowed_sort:
+        sort = "id_livre"
+
+
     with get_db() as db:
         query = db.query(Livre)
 

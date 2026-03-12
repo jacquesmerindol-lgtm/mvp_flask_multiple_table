@@ -15,152 +15,10 @@ from models import Recette
 from config import get_settings
 settings = get_settings()
 
+import json
 
 
 recettes_bp = Blueprint("recettes", __name__, url_prefix="/recettes")
-
-
-# @recettes_bp.route("/", methods=["GET"])
-# def index():
-#     form_search = RecetteSearchForm(request.args)
-
-#     with get_db() as db:
-#         if form_search.id_recette.data:
-#             recettes = recette_crud.search_by_id(db, form_search.id_recette.data)
-#         else:
-#             recettes = recette_crud.get_all(db)
-
-#         livres = livre_crud.get_all(db)
-
-#     # Pour affichage dans le tableau
-#     livres_dict = {
-#         l.id_livre: f"{l.numero_livre or 'N/A'} — {l.nom_livre}"
-#         for l in livres
-#     }
-
-#     form_delete = RecetteDeleteForm()
-
-#     return render_template(
-#         "recettes/index.html",
-#         recettes=recettes,
-#         livres=livres_dict,
-#         form_search=form_search,
-#         form_delete=form_delete
-#     )
-
-# @recettes_bp.route("/", methods=["GET"])
-# def index():
-#     form_search = RecetteSearchForm(request.args)
-
-#     # Lecture des paramètres de tri
-#     sort = request.args.get("sort", "id_recette")
-#     order = request.args.get("order", "asc")
-
-#     with get_db() as db:
-#         # Base de la requête
-#         query = db.query(Recette)
-#         query = query.order_by(Recette.position.asc())
-
-
-#         # Recherche par ID
-#         if form_search.id_recette.data:
-#             query = query.filter(Recette.id_recette == form_search.id_recette.data)
-
-#         # Tri dynamique sécurisé
-#         column = getattr(Recette, sort, Recette.id_recette)
-
-#         if order == "desc":
-#             query = query.order_by(desc(column))
-#         else:
-#             query = query.order_by(asc(column))
-
-#         recettes = query.all()
-
-#         # Chargement des livres pour affichage
-#         livres = livre_crud.get_all(db)
-#         livres_dict = {
-#             l.id_livre: f"{l.numero_livre or 'N/A'} — {l.nom_livre}"
-#             for l in livres
-#         }
-
-#     form_delete = RecetteDeleteForm()
-
-#     return render_template(
-#         "recettes/index.html",
-#         recettes=recettes,
-#         livres=livres_dict,
-#         form_search=form_search,
-#         form_delete=form_delete
-#     )
-
-# @recettes_bp.route("/", methods=["GET"])
-# def index():
-#     form_search = RecetteSearchForm(request.args)
-
-#     # Lecture des paramètres de tri
-#     sort = request.args.get("sort", "id_recette")
-#     order = request.args.get("order", "asc")
-
-#     with get_db() as db:
-#         # Base de la requête
-#         query = db.query(Recette)
-
-#         # Recherche
-#         if form_search.id_recette.data:
-#             query = query.filter(Recette.id_recette == form_search.id_recette.data)
-
-
-#         # --- Filtrage multi-champs ---
-#         if form_search.nom_recette.data:
-#             query = query.filter(
-#                 Recette.nom_recette.ilike(f"%{form_search.nom_recette.data}%")
-#             )
-
-#         if form_search.type_recette.data:
-#             query = query.filter(
-#                 Recette.type_recette == form_search.type_recette.data
-#             )
-
-#         if form_search.nombre_personnes.data:
-#             query = query.filter(
-#                 Recette.nombre_personnes == form_search.nombre_personnes.data
-#             )
-
-#         if form_search.id_livre_reference.data and form_search.id_livre_reference.data != 0:
-#             query = query.filter(
-#                 Recette.id_livre_reference == form_search.id_livre_reference.data
-#             )
-
-#         # --- Tri dynamique ---
-#         column = getattr(Recette, sort, Recette.id_recette) 
-#         query = query.order_by(
-#             desc(column) if order == "desc" else asc(column)
-#         )
-
-#         recettes = query.all()
-
-#         # Chargement des livres pour affichage
-#         livres = livre_crud.get_all(db)
-#         livres_dict = {
-#             l.id_livre: f"{l.numero_livre or 'N/A'} — {l.nom_livre}"
-#             for l in livres
-#         }
-
-#         # Remplissage du select Livre
-#         form_search.id_livre_reference.choices = [(0, "Tous")] + [
-#             (l.id_livre, f"{l.numero_livre or 'N/A'} — {l.nom_livre}") for l in livres
-#         ]
-
-
-#     form_delete = RecetteDeleteForm()
-
-#     return render_template(
-#         "recettes/index.html",
-#         recettes=recettes,
-#         livres=livres_dict,
-#         form_search=form_search,
-#         form_delete=form_delete
-#     )
 
 @recettes_bp.route("/", methods=["GET"])
 def index():
@@ -169,6 +27,11 @@ def index():
 
     sort = request.args.get("sort", "id_recette")
     order = request.args.get("order", "asc")
+
+    # Whitelist de tri (optionnel mais recommandé)
+    allowed_sort = {"id_recette", "nom_recette", "type_recette", "nombre_personnes", "id_livre_reference"}
+    if sort not in allowed_sort:
+        sort = "id_recette"
 
     with get_db() as db:
         query = db.query(Recette)
@@ -233,15 +96,30 @@ def create():
     form = RecetteCreateForm()
 
     if form.validate_on_submit():
+        # textfield envoit une list mais dans une string (WTForms est un textfield), il faut remplacer les ' dans python par des " dans JSON pour appler le json.loads et avoir une liste dans SQLAlchemy
+        # --- Parsing JSON sécurisé ---
+        try:
+            liste_ingredients_raw = form.liste_ingredients.data or []
+            liste_ingredients_list = json.loads(liste_ingredients_raw.replace("'", '"'))
+
+            instructions_raw = form.instructions.data or []
+            instructions_list = json.loads(instructions_raw.replace("'", '"'))
+        except json.JSONDecodeError: 
+            flash("Les champs doivent contenir du JSON valide.", "danger")
+            return render_template("recettes/create.html", form=form)
+
+
         data = {
             "nom_recette": form.nom_recette.data,
             "type_recette": form.type_recette.data,
             "nombre_personnes": form.nombre_personnes.data,
-            "duree_preparation": form.duree_preparation.data or 0,
-            "duree_cuisson": form.duree_cuisson.data or 0,
-            "duree_repos": form.duree_repos.data or 0,
-            "liste_ingredients": form.liste_ingredients.data or [],
-            "instructions": form.instructions.data or None,
+            "duree_preparation": form.duree_preparation.data or "0 min",
+            "duree_cuisson": form.duree_cuisson.data or "0 min",
+            "duree_repos": form.duree_repos.data or "0 min",
+            # "liste_ingredients": form.liste_ingredients.data or [],
+            # "instructions": form.instructions.data or None,
+            "liste_ingredients": liste_ingredients_list, #envoyer une liste pour SQLAlchemy 
+            "instructions": instructions_list,
             "astuce": form.astuce.data or None,
             "id_livre_reference": form.id_livre_reference.data
         }
@@ -261,16 +139,10 @@ def create():
     return render_template("recettes/create.html", form=form)
 
 
-
-
 @recettes_bp.route("/<int:id_recette>", methods=["GET"])
 def detail(id_recette):
     with get_db() as db:
         recette = recette_crud.get(db, id_recette)
-        if not recette:
-            flash("Recette non trouvée.", "danger")
-            return redirect(url_for("recettes.index"))
-
         livre = livre_crud.get(db, recette.id_livre_reference)
 
     form_edit = RecetteUpdateForm(obj=recette)
@@ -285,28 +157,40 @@ def detail(id_recette):
     )
 
 
+
 @recettes_bp.route("/<int:id_recette>/update", methods=["GET", "POST"])
 def update_ui(id_recette):
 
     with get_db() as db:
         recette = recette_crud.get(db, id_recette)
-        if not recette:
-            flash("Recette non trouvée.", "danger")
-            return redirect(url_for("recettes.index"))
 
-        # Pré-remplissage du formulaire avec l'objet existant
         form = RecetteUpdateForm(obj=recette)
 
         if form.validate_on_submit():
+
+            # textfield envoit une list mais dans une string, il faut remplacer les ' dans python par des " dans JSON
+            try :
+                liste_ingredients_raw = form.liste_ingredients.data or []
+                liste_ingredients_list = json.loads(liste_ingredients_raw.replace("'", '"'))
+
+                instructions_raw = form.instructions.data or []
+                instructions_list = json.loads(instructions_raw.replace("'", '"'))
+            except json.JSONDecodeError: 
+                flash("Les champs doivent contenir du JSON valide.", "danger")
+                return render_template("recetes/edit.html", form=form, recette=recette)
+
             data = {
                 "nom_recette": form.nom_recette.data,
                 "type_recette": form.type_recette.data,
                 "nombre_personnes": form.nombre_personnes.data,
-                "duree_preparation": form.duree_preparation.data or 0,
-                "duree_cuisson": form.duree_cuisson.data or 0,
-                "duree_repos": form.duree_repos.data or 0,
-                "liste_ingredients": form.liste_ingredients.data or [],
-                "instructions": form.instructions.data or None,
+                "duree_preparation": form.duree_preparation.data or "0 min",
+                "duree_cuisson": form.duree_cuisson.data or "0 min",
+                "duree_repos": form.duree_repos.data or "0 min",
+                # "liste_ingredients": form.liste_ingredients.data or [],          
+                # "instructions": form.instructions.data or None,
+                "liste_ingredients": liste_ingredients_list,
+                "instructions": instructions_list,
+
                 "astuce": form.astuce.data or None,
                 "id_livre_reference": form.id_livre_reference.data
             }

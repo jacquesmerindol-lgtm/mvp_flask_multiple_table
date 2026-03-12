@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "bootstrap5/form.html" import render_form %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Résultat de la liste des courses</h2>
+    <!-- Boutons de navigation -->
+    <div class="mt-3 mb-4"> 
+        <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+            🏠 Retour à l'accueil
+        </a>
+    
+    <!-- Nouveau bouton : Liste courses -->
+    <form action="{{ url_for('list_courses.generate') }}" method="post" class="d-inline">
+      <button type="submit" class="btn btn-success">
+        📝 Générer une liste de courses
+      </button>
+    </form>
+</div>
+
+<div class="card shadow-sm mt-4">
+
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            Liste des courses — {{ results.date_liste_course}}
+        </h5>
+    </div>
+
+    <div class="card-body"> 
+        <!-- Date de la Liste recettes -->
+        <p><strong>Date de la liste de courses:</strong> {{ results.date_liste_course}}</p>
+        
+        <!-- Liste recettes -->
+        <details open class="mb-3">
+            <summary class="text-primary" style="cursor:pointer;">
+                Liste des recettes ({{ results.liste_recette|length }})
+            </summary>
+            <pre class="bg-light p-3 rounded small mt-2"
+                 style="max-height: 10rem; overflow-y: auto; white-space: pre-wrap;">
+{% for r in results.liste_recette %}
+- {{ r.nom_recette }} ({{ r.nom_livre }}) ({{ r.numero_livre }})
+{% endfor %}
+            </pre>
+        </details>
+
+        <!-- liste des courses -->
+        <details open class="mb-3">
+            <summary class="text-primary" style="cursor:pointer;">
+                Liste des courses ({{ results.liste_course|length }})
+            </summary>
+            <pre class="bg-light p-3 rounded small mt-2"
+                style="max-height: 8rem; overflow-y: auto; white-space: pre-wrap;">
+{{ results.liste_course }}
+                </pre>
+        </details>
+    </div>
+</div>
+
+{% endblock %}

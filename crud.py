@@ -2,7 +2,7 @@ from typing import TypeVar, Generic, List, Optional, Type
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from models import Livre, Recette
+from models import Livre, Recette, Course
 
 T = TypeVar("T")
 
@@ -37,7 +37,6 @@ class CRUDGeneric(Generic[T]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
-
 
     def delete_restricted(self, db: Session, id_: int) -> bool:
         obj = self.get(db, id_)
@@ -79,8 +78,6 @@ class CRUDGeneric(Generic[T]):
         db.commit()
         return count
 
-
-    
     def search_by_id(self, db: Session, id_: int) -> List[T]: 
         return db.query(self.model).filter(self.pk == id_).all()
     
@@ -108,3 +105,5 @@ class CRUDGeneric(Generic[T]):
 # Instances spécifiques
 livre_crud = CRUDGeneric(Livre)
 recette_crud = CRUDGeneric(Recette)
+course_crud = CRUDGeneric(Course)
+

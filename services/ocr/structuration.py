@@ -135,7 +135,7 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Type
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -146,10 +146,23 @@ from langchain_openai import ChatOpenAI
 # 1. Modèle Pydantic : schéma final 
 # =========================================================
 
+# # ----scémas input--- from ocr processor 
+# class OCRResult(BaseModel):
+#     image_path: str = ""
+#     md_data: str = ""
+#     enhanced_md: str = Field(default="", description="Markdown amélioré par LLM (optionnel)")
+
+# class OCRResults(RootModel[List[OCRResult]]):
+#     pass
+from services.ocr.ocr_processor import OCRResults, OCRResult
+
+
 # --- Tes schémas ---
 class Ingredient(BaseModel):
-    nom: str = Field(description="Nom de l’ingrédient, sans quantité.")
+    ingredient: str = Field(description="Nom de l’ingrédient, sans quantité.")
     quantite: str = Field(description="Quantité associée à l’ingrédient; répond non précisé si aucune quantité n'est mentionnée.")
+    unite : str = Field(description="Unité associée à l’ingrédient; répond par une chaine de caractèrevide si aucune unité n'est mentionnée.")
+
 
 class Recette(BaseModel):
     lien_fichier: str = Field(
@@ -164,25 +177,27 @@ class Recette(BaseModel):
         description="Nombre de personnes indiqué dans le texte."
     )
 
-    temps_preparation: str = Field(
+    duree_preparation: str = Field(
         description="Durée de préparation indiquée dans le texte."
     )
 
-    temps_cuisson: str = Field(
+    duree_cuisson: str = Field(
         description="Durée de cuisson indiquée dans le texte."
     )
 
-    temps_repos: str = Field(
+    duree_repos: str = Field(
         description="Durée de repos indiquée dans le texte, ou chaîne vide si absente."
     )
 
-    ingredients: List[Ingredient] = Field( 
+    liste_ingredients: List[Ingredient] = Field( 
         description=( 
             "Liste structurée de tous les ingrédients mentionnés dans la section ingrédients. "
             "Le champ 'ingredients' doit être une liste d'objets au format Ingredient: {nom, quantite}."
-            "Chaque élément contient un nom d’ingrédient et une quantité séparée." ) )
+            "Chaque élément contient un nom d’ingrédient et une quantité séparée."
+            "utilise uniquement les apostrophes typographiques ’ et non les apostrophes internes ' dans les phrases  ")
+    )
 
-    etapes: List[str] = Field(
+    instructions: List[str] = Field(
         description="Étapes de préparation générales (section 'LA RECETTE'), en incluant les éléments listés dans la section PRÉPARATION AU ROBOT." )
     
     etapes_companion: List[str] = Field(
@@ -192,15 +207,14 @@ class Recette(BaseModel):
             "combiner le texte de la première colonne avec l'instruction de la colonne 'Companion'. "
             "Ignorer les lignes vides mais inclure les lignes d'accessoires. "
             "Si le tableau ne contient pas de colonne 'Companion', renvoyer ['néant']."
+            "utilise uniquement les apostrophes typographiques ’ et non les apostrophes internes ' dans les phrases "
         )
     )
 
-    astuces: str = Field(
+    astuce: str = Field(
         description="Conseils ou remarques éventuelles extraits du texte."
     )
-
-
-
+    
 class Facture(BaseModel):
     lien_fichier: str
     numero_facture: str
@@ -238,10 +252,10 @@ class StructurationLLM:
         # ---------------------------------------------------------
         # schema_name est une chaîne ("Recette", "Facture", etc.)
         # SCHEMAS[schema_name] renvoie la classe Pydantic correspondante.
-        schema_class = SCHEMAS[schema_name]
+        self.schema_class = SCHEMAS[schema_name]
 
         # Parser JSON basé sur le schéma sélectionné
-        self.parser = PydanticOutputParser(pydantic_object=schema_class)
+        self.parser = PydanticOutputParser(pydantic_object=self.schema_class)
         self.format_instructions = self.parser.get_format_instructions()
         self.fieldname = fieldname
 
@@ -252,6 +266,11 @@ class StructurationLLM:
             openai_api_key="not-needed",
             temperature=temperature,
         )
+
+        # Propriétés internes - toujours initialisées
+        self._input_model: OCRResults | None = None
+        self._output_model: list[BaseModel] | None = None
+
 
         # Prompt de structuration
         template = """
@@ -306,7 +325,29 @@ Fieldname du fichier texte :
         )
 
         return chain.invoke({"texte": texte})
+    
+    def run(self, OCR_results: OCRResults) :
+        self._input_model = OCR_results
+        structured_items = [] 
+        print("TYPE OCR:", type(OCR_results))
 
+        for item in OCR_results.root:
+            # 1) Récupération du texte OCR à structurer
+            texte = item.enhanced_md or item.md_data
+
+            if not texte:
+                continue  # sécurité
+
+            # 2) Récupération des fieldname du texte OCR à structurer
+            self.fieldname = item.image_path
+
+            # 3) Appel de la méthode correcte
+            recette = self.structure_text(texte)
+            structured_items.append(recette)
+        
+        # Construire le modèle Pydantic
+        self._output_model = structured_items
+        return self._output_model
 
 # ---------------------------------------------------------
 #  MAIN (DEBUG StructurationLLM)

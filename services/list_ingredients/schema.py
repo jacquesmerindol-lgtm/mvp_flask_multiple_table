@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from typing import List, Optional, Any
 
 class Ingredient(BaseModel):
-    quantite: Optional[str]
-    unite: Optional[str]
+    quantite: Optional[str] = ""
+    unite: Optional[str] = ""
     ingredient: str
 
 class RecetteSelection(BaseModel):

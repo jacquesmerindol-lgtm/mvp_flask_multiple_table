@@ -43,19 +43,19 @@
 
             <p>
                 <strong>Temps :</strong><br>
-                Préparation : {{ item.temps_preparation }}<br>
-                Cuisson : {{ item.temps_cuisson }}<br>
-                Repos : {{ item.temps_repos }}
+                Préparation : {{ item.duree_preparation }}<br>
+                Cuisson : {{ item.duree_cuisson }}<br>
+                Repos : {{ item.duree_repos }}
             </p>
 
             <!-- Ingrédients -->
             <details open class="mb-3">
                 <summary class="text-primary" style="cursor:pointer;">
-                    Ingrédients ({{ item.ingredients|length }})
+                    Ingrédients ({{ item.liste_ingredients|length }})
                 </summary>
                 <pre class="bg-light p-3 rounded small mt-2"
                      style="max-height: 10rem; overflow-y: auto; white-space: pre-wrap;">
-{% for ing in item.ingredients %}
+{% for ing in item.liste_ingredients %}
 - {{ ing }}
 {% endfor %}
                 </pre>
@@ -64,11 +64,11 @@
             <!-- Étapes générales -->
             <details open class="mb-3">
                 <summary class="text-primary" style="cursor:pointer;">
-                    Étapes générales ({{ item.etapes|length }})
+                    Étapes générales ({{ item.instructions|length }})
                 </summary>
                 <pre class="bg-light p-3 rounded small mt-2"
                      style="max-height: 12rem; overflow-y: auto; white-space: pre-wrap;">
-{% for step in item.etapes %}
+{% for step in item.instructions %}
 - {{ step }}
 {% endfor %}
                 </pre>
@@ -94,7 +94,7 @@
                 </summary>
                 <pre class="bg-light p-3 rounded small mt-2"
                      style="max-height: 8rem; overflow-y: auto; white-space: pre-wrap;">
-{{ item.astuces }}
+{{ item.astuce }}
                 </pre>
             </details>
 

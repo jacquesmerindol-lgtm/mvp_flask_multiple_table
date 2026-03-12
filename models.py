@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Text, JSON, ForeignKey, Index, CheckConstraint
+from sqlalchemy import Column, Integer, String, Text, JSON, ForeignKey, Index, CheckConstraint, Date
 from sqlalchemy.orm import relationship
 
 from database import Base
+from datetime import date
 
 
 class Livre(Base):
@@ -31,11 +32,13 @@ class Recette(Base):
     nom_recette = Column(String(255), nullable=False, unique=True)
     type_recette = Column(String(30), nullable=False)
     nombre_personnes = Column(Integer, CheckConstraint("nombre_personnes >= 0"), nullable=False)
-    duree_preparation = Column(Integer, CheckConstraint("duree_preparation >= 0"), default=0)
-    duree_cuisson = Column(Integer, CheckConstraint("duree_cuisson >= 0"), default=0)
-    duree_repos = Column(Integer, CheckConstraint("duree_repos >= 0"), default=0)
-    liste_ingredients = Column(JSON)  # list[dict]
-    instructions = Column(Text, nullable=True)
+    duree_preparation = Column(String(30))
+    duree_cuisson = Column(String(30))
+    duree_repos = Column(String(30))
+    # liste_ingredients = Column(JSON)  # list[dict]
+    # instructions = Column(JSON)       # list[str] ← changement ici
+    liste_ingredients = Column(JSON)
+    instructions = Column(JSON)
     astuce = Column(Text, nullable=True)
 
     id_livre_reference = Column(
@@ -50,3 +53,25 @@ class Recette(Base):
 
     livre = relationship("Livre", back_populates="recettes")
     __unique_fields__ = ["nom_recette"]
+
+
+class Course(Base):
+    __tablename__ = "course"
+
+    id_course = Column(Integer, primary_key=True, autoincrement=True)
+    position = Column(Integer, default=0)
+
+    # Date de la liste de course
+    date_liste_course = Column(Date, nullable=False, default=date.today)
+
+    # Liste des recettes (ex: ["pâtes", "salade"])
+    liste_recette = Column(JSON, nullable=False, default=list)
+
+    # Liste de course (texte brut ou JSON selon ton usage)
+    liste_course = Column(Text, nullable=False)
+
+    __table_args__ = (
+        Index("idx_course_id_course", "id_course"),
+    )
+
+                       
