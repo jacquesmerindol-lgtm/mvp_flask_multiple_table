@@ -12,7 +12,7 @@ from routes.recettes import recettes_bp
 from routes.courses import courses_bp
 
 from services.ocr.routes import bp as ocr_bp
-from services.list_ingredients.routes import ingredients_bp
+from services.list_course.routes import ingredients_bp
 from services.list_ingredients_simple.routes import ingredients_bp_simple
 from services.list_course.routes import list_course_bp
 

@@ -26,8 +26,8 @@
         <div class="alert alert-info">
           <strong>Recettes déjà sélectionnées :</strong>
           <ul class="mb-0">
-            {% for rid, data in selected_data.items() %}
-              <li>{{ recette_map[rid] }} — x{{ data.nb_recette }}</li>
+            {% for item in selected_data %}
+              <li>{{ recette_map[item.id_recette] }} — x{{ item.nb_recette }}</li>
             {% endfor %}
           </ul>
           <form method="POST" action="{{ url_for('list_courses.generate') }}">
@@ -168,7 +168,7 @@
                       {% if ingredients %}
                         <span class="badge bg-secondary"
                               data-bs-toggle="tooltip"
-                              title="{% for ing in ingredients %}{{ ing.quantite }} {{ ing.nom }}{% if not loop.last %}, {% endif %}{% endfor %}">
+                              title="{% for ing in ingredients %}{{ ing.ingredient }} : {{ ing.quantite }} {{ ing.unite }}{% if not loop.last %}, {% endif %}{% endfor %}">
                           {{ ingredients | length }} ingrédients
                         </span>
                       {% else %}

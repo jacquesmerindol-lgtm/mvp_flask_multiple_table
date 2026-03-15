@@ -85,7 +85,8 @@ def save_uploaded_files(files):
 # Elle orchestre :
 #   1. la conversion des fichiers uploadés
 #   2. la récupération du processor (singleton)
-#   3. l'exécution du pipeline OCR (défini dans ocr_processor.py)
+#   3. l'exécution du pipeline OCR (défini dans ocs
+# r_processor.py)
 def run_pipeline_ocr(files, use_llm=True):
     """
     Pipeline OCR complet :

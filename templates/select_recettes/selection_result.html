@@ -46,21 +46,22 @@
                 </thead>
 
                 <tbody>
-                  {% for rid, data in selected_data.items() %}
+                  {% for item in selected_data %}
+
                   <tr>
 
-                    <td>{{ recette_map[rid] }}</td>
+                    <td>{{ recette_map[item.id_recette] }}</td>
 
                     <td style="width: 120px;">
                       <input type="number"
-                             name="nb_recette_{{ rid }}"
+                             name="nb_recette_{{ item.id_recette }}"
                              class="form-control"
-                             value="{{ data.nb_recette }}"
+                             value="{{ item.nb_recette }}"
                              min="1">
                     </td>
 
                     <td>
-                      <button name="delete" value="{{ rid }}" class="btn btn-danger btn-sm">
+                      <button name="delete" value="{{ item.id_recette }}" class="btn btn-danger btn-sm">
                         Supprimer
                       </button>
                     </td>
