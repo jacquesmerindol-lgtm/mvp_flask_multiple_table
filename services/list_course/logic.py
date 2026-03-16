@@ -82,7 +82,7 @@ def build_selection_pydantic(selected_data: ListeRecetteQuantifiee) -> ListeRece
     # ------------------------------------------------------------
     # 7. Retourner un modèle enveloppe Pydantic propre
     # ------------------------------------------------------------
-    return ListeRecetteSelection(recette_selection_item=enriched_list)
+    return ListeRecetteSelection(recette_selection_items=enriched_list)
 
 
 

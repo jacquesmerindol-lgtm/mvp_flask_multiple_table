@@ -27,7 +27,7 @@
           <strong>Recettes déjà sélectionnées :</strong>
           <ul class="mb-0">
             {% for item in selected_data %}
-              <li>{{ recette_map[item.id_recette].nom_recette }} — x{{ item.nb_recette }}</li>
+              <li>{{ recette_map[item.id_recette] }} — x{{ item.nb_recette }}</li>
             {% endfor %}
           </ul>
           <form method="POST" action="{{ url_for('list_courses.generate') }}">
