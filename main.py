@@ -24,6 +24,8 @@ from flask_bootstrap import Bootstrap5
 
 import json
 
+import uuid
+
 
 def create_app():
     app = Flask(__name__)
@@ -32,6 +34,10 @@ def create_app():
     # Configuration
     app.config["SECRET_KEY"] = settings.SECRET_KEY
     app.config["WTF_CSRF_ENABLED"] = True
+
+    # Création d’un workflow global
+    app.config["WORKFLOW_ID"] = str(uuid.uuid4())
+    print(f"[INIT] WORKFLOW_ID = {app.config['WORKFLOW_ID']}")
 
     # Bootstrap-Flask
     from flask_bootstrap import Bootstrap

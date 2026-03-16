@@ -8,6 +8,11 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DATABASE_URL: str
 
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: str | None = None
+
     ROBOTS_LIST: list[str] = ["Companion", "Cookeo", "Robot Chef X"]
     RECETTE_TYPES: list[str] = [
         "Entree",

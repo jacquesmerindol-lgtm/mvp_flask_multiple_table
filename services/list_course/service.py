@@ -20,7 +20,8 @@ from langchain_core.output_parsers import StrOutputParser
 from pydantic import BaseModel, Field
 from services.list_course.schema import (
     RecetteSelection,
-    ListeCourse
+    ListeCourse,
+    ListeRecetteSelection
 )
 #
 
@@ -89,8 +90,8 @@ class ListeCourses:
         self.temperature = temperature
 
         # Propriétés internes - toujours initialisées
-        self._input_model: list[RecetteSelection] = []
-        self._output_model: ListeCourse | None = None
+        # self._input_model: ListeRecetteSelection | None = None
+        # self._output_model: ListeCourse | None = None
 
         # Initialisation du modèle LLM
         self._model = ChatOpenAI(
@@ -100,43 +101,41 @@ class ListeCourses:
             temperature=self.temperature
         )
 
-    def set_input(self, data: list[RecetteSelection]) -> None:
-        """
-        Définit les données d'entrée pour le traitement.
+    # def set_input(self, data: ListeRecetteSelection) -> None:
+    #     """
+    #     Définit les données d'entrée pour le traitement.
+    #     """
+    #     # À ce stade, Pydantic a déjà validé `data`.
+    #     # Aucune vérification supplémentaire n'est nécessaire.
+    #     self._input_model = data
 
-        Args:
-            data: Liste de recettes au format RecetteSelection
-
-        Raises:
-            ValueError: Si les données sont invalides
-        """
-        if not isinstance(data, list) or len(data) == 0:
-            raise ValueError("Input must be a non-empty list of RecetteSelection objects")
-        self._input_model = data
-
-    def run(self) -> ListeCourse | None:
+    # def run(self) -> ListeCourse | None:
+    def run(self, data: ListeRecetteSelection) -> ListeCourse:
         """
         Exécute le traitement complet pour générer la liste de courses.
 
         Returns:
             ListeCourse: Résultat du traitement ou None en cas d'erreur
         """
-        if not self._input_model:
-            logger.error("No input data provided")
-            return None
+        # if not self._input_model:
+        #     logger.error("No input data provided")
+        #     return None
 
         try:
             # Construction de la liste de courses via LLM
-            liste_courses = self._construire_liste_course(self._input_model)
+            # Correction : on passe la liste minimale au LLM
+            # recettes_minimal: list[RecetteSelection]= self._input_model.recette_selection_items
+            recettes_minimal: list[RecetteSelection] = data.recette_selection_items
+            liste_courses = self._construire_liste_course(recettes_minimal)
 
             # Création du modèle de sortie
             output = ListeCourse(
                 date_liste_course=datetime.now(),
-                liste_recette=self._input_model,
+                liste_recette=recettes_minimal,
                 liste_course=liste_courses
             )
 
-            self._output_model = output
+            # self._output_model = output
             return output
 
         except Exception as e:
