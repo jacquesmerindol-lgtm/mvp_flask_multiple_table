@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+<!-- {% extends "base.html" %}
 
 {% block content %}
 <div class="container mt-4">
@@ -35,4 +35,77 @@
   </div>
 
 </div>
+{% endblock %} -->
+{% extends "base.html" %}
+{% block content %}
+
+{# ============================================================ #}
+{# SECTION : TITRE                                              #}
+{# ============================================================ #}
+<section class="py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2 class="mb-3">Initialisation du traitement OCR</h2>
+        <p class="text-muted">
+          Sélectionnez les images à traiter et choisissez si le LLM doit être utilisé.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{# ============================================================ #}
+{# SECTION : FORMULAIRE OCR                                     #}
+{# ============================================================ #}
+<section class="py-2">
+  <div class="container">
+    <div class="row justify-content-start">
+      <div class="col-md-8">
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+
+            <form action="{{ url_for('ocr.init_ui') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+
+              {# Champ : fichiers #}
+              <div class="mb-3">
+                <label for="files" class="form-label fw-bold">Images</label>
+                <input type="file"
+                       class="form-control"
+                       id="files"
+                       name="files"
+                       multiple
+                       required>
+              </div>
+
+              {# Champ : checkbox LLM #}
+              <div class="form-check mb-3">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="use_llm"
+                       name="use_llm">
+                <label class="form-check-label" for="use_llm">
+                  Activer LLM ?
+                </label>
+              </div>
+
+              {# Bouton de validation #}
+              <button type="submit" class="btn btn-primary">
+                Valider
+              </button>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
 {% endblock %}

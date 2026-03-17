@@ -1,45 +1,102 @@
 {% extends "base.html" %}
 {% from "bootstrap5/form.html" import render_form %}
-
 {% block content %}
-<div class="container mt-4">
 
-    <h2>Générer une liste de courses</h2>
+{# ============================================================ #}
+{# SECTION : TITRE                                              #}
+{# ============================================================ #}
+<section class="py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2 class="mb-4">Générer une liste de courses</h2>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+
+{# ============================================================ #}
+{# SECTION : FORMULAIRE DE GÉNÉRATION                           #}
+{# ============================================================ #}
+<section class="py-2">
+  <div class="container">
+    <div class="row justify-content-start">
+      <div class="col-md-6">
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
             {{ render_form(form, action=url_for('list_courses.generate'), method='POST') }}
+          </div>
         </div>
+
+      </div>
     </div>
+  </div>
+</section>
 
-    {% if results %}
-    <div class="card shadow-sm mt-4">
 
-        <div class="card-header bg-primary text-white">
+{# ============================================================ #}
+{# SECTION : RÉSULTAT DE LA LISTE DE COURSES                    #}
+{# ============================================================ #}
+{% if results %}
+<section class="py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+
+        <div class="card shadow-sm">
+
+          <div class="card-header bg-primary text-white">
             <h5 class="mb-0">
-                Liste des courses — {{ results.date_liste_course }}
+              Liste des courses — {{ results.date_liste_course }}
             </h5>
-        </div>
+          </div>
 
-        <div class="card-body">
+          <div class="card-body">
 
-            <details open class="mb-3">
-                <summary>Recettes</summary>
-                <pre>
-{% for r in results.liste_recette %}
-- {{ r.nom_recette }} ({{ r.nom_livre }} n°{{ r.numero_livre }})
-{% endfor %}
+            {# ============================================================ #}
+            {# SECTION : LISTE DES RECETTES                                 #}
+            {# ============================================================ #}
+            <details class="mb-3" open>
+              <summary class="text-primary fw-bold" style="cursor:pointer;">
+                Recettes ({{ results.liste_recette|length }})
+              </summary>
+
+              <div class="bg-light p-3 rounded mt-2">
+                <ul class="mb-0">
+                  {% for r in results.liste_recette %}
+                    <li>
+                      {{ r.nom_recette }} ({{ r.nom_livre }} — n°{{ r.numero_livre }})
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </details>
+
+
+            {# ============================================================ #}
+            {# SECTION : LISTE DES COURSES                                  #}
+            {# ============================================================ #}
+            <details class="mb-3" open>
+              <summary class="text-primary fw-bold" style="cursor:pointer;">
+                Liste des courses ({{ results.liste_course|length }})
+              </summary>
+
+              <div class="bg-light p-3 rounded mt-2">
+                <pre class="small mb-0" style="white-space: pre-wrap; max-height: 12rem; overflow-y: auto;">
+{{ results.liste_course }}
                 </pre>
+              </div>
             </details>
 
-            <details open>
-                <summary>Liste des courses</summary>
-                <pre>{{ results.liste_course }}</pre>
-            </details>
-
+          </div>
         </div>
-    </div>
-    {% endif %}
 
-</div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 {% endblock %}

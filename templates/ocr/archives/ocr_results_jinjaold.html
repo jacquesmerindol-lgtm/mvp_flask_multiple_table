@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <h2>Résultats du traitement OCR</h2>
+
+  <!-- Boutons de navigation -->
+  <div class="mt-3 mb-4">
+    <a href="{{ url_for('ocr.init_ui') }}" class="btn btn-secondary me-2">
+      🔄 Refaire une saisie
+    </a>
+
+    <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+      🏠 Retour à l'accueil
+    </a>
+
+    <!-- Nouveau bouton : structuration -->
+    <form action="{{ url_for('ocr.structuration_ui') }}" method="post" class="d-inline">
+      <button type="submit" class="btn btn-success">
+        🧩 Structurer les données
+      </button>
+    </form>
+  </div>
+
+  {% for item in results.ocr_results_items  %}
+  <div class="card shadow-sm mt-4">
+    <div class="card-body">
+
+      <h5 class="card-title">{{ item.image_path }}</h5>
+
+      <!-- Markdown brut -->
+      <h6 class="mt-3">Markdown brut</h6>
+      <details class="mt-2" open>
+        <summary class="text-primary" style="cursor: pointer;">Afficher / masquer le contenu complet</summary>
+        <pre class="bg-light p-3 rounded small mt-2"
+             style="max-height: 18rem; overflow-y: auto; white-space: pre-wrap;">
+{{ item.md_data }}
+        </pre>
+      </details>
+
+      <!-- Markdown amélioré -->
+      <h6 class="mt-3">Markdown amélioré (LLM)</h6>
+      {% if item.enhanced_md %}
+        <details class="mt-2">
+          <summary class="text-primary" style="cursor: pointer;">Afficher / masquer le contenu complet</summary>
+          <pre class="bg-light p-3 rounded small mt-2"
+               style="max-height: 18rem; overflow-y: auto; white-space: pre-wrap;">
+{{ item.enhanced_md }}
+          </pre>
+        </details>
+      {% else %}
+        <p class="text-muted fst-italic">Aucune amélioration LLM n’a été générée.</p>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

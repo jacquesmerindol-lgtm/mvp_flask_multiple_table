@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Recettes enregistrées avec succès</h2>
+
+    <div class="alert alert-success">
+        Les recettes ont été ajoutées dans le livre sélectionné.
+    </div>
+
+    <div class="mb-4 d-flex gap-3">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            🏠 Retour à l'accueil
+        </a>
+
+        <a href="{{ url_for('ocr.init_ui') }}" class="btn btn-success">
+            🔁 Relancer une intégration
+        </a>
+    </div>
+
+    {% for r in results %}
+    <div class="card mb-4 shadow-sm">
+
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">{{ r.nom_recette }}</h5>
+        </div>
+
+        <div class="card-body">
+
+            <p><strong>ID recette :</strong> {{ r.id_recette }}</p>
+            <p><strong>Nombre de personnes :</strong> {{ r.nombre_personnes }}</p>
+
+            <p>
+                <strong>Durées :</strong><br>
+                Préparation : {{ r.duree_preparation }} min<br>
+                Cuisson : {{ r.duree_cuisson }} min<br>
+                Repos : {{ r.duree_repos }} min
+            </p>
+
+            <!-- INGREDIENTS -->
+            <details class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Liste d'Ingrédients
+                </summary>
+                
+                <div class="bg-light p-3 rounded mt-2">
+                    <ul class="mb-0">
+                        {% for ing in r.liste_ingredients %}
+                            <li>
+                                <strong>{{ ing.ingredient }}</strong>
+                                — {{ ing.quantite }} {{ ing.unite }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </details>
+            
+            <!-- INSTRUCTIONS -->
+            <details class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Instructions
+                </summary>
+
+                <div class="bg-light p-3 rounded mt-2">
+                    <ol class="mb-0">
+                        {% for step in r.instructions %}
+                            <li>{{ step }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </details>
+
+             <!-- ASTUCE -->
+            {% if r.astuce %}
+            <details class="mb-3">
+                <summary class="text-primary" style="cursor:pointer;">
+                    Astuce
+                </summary>
+                <pre class="bg-light p-3 rounded small mt-2"
+                     style="white-space: pre-wrap;">
+{{ r.astuce }}
+                </pre>
+            </details>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

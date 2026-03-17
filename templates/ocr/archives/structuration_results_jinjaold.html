@@ -21,9 +21,9 @@
 <section class="py-2">
   <div class="container">
     <div class="row">
-      <div class="col d-flex flex-wrap gap-3">
+      <div class="col d-flex gap-3">
 
-        <form action="{{ url_for('ocr.structuration_ui') }}" method="POST">
+        <form action="{{ url_for('ocr.structuration_ui') }}" method="post">
           <button type="submit" class="btn btn-success">
             🔁 Relancer la structuration
           </button>
@@ -63,9 +63,7 @@
 
           <div class="card-body">
 
-            {# ============================================================ #}
-            {# SECTION : INFOS GÉNÉRALES                                   #}
-            {# ============================================================ #}
+            {# --- Infos générales --- #}
             <div class="mb-3">
               <p><strong>Fichier source :</strong> {{ item.lien_fichier }}</p>
               <p><strong>Nombre de personnes :</strong> {{ item.nombre_personnes }}</p>
@@ -79,9 +77,7 @@
             </div>
 
 
-            {# ============================================================ #}
-            {# SECTION : INGRÉDIENTS                                       #}
-            {# ============================================================ #}
+            {# --- Ingrédients --- #}
             <details class="mb-3" open>
               <summary class="text-primary fw-bold" style="cursor:pointer;">
                 Ingrédients ({{ item.liste_ingredients|length }})
@@ -100,9 +96,7 @@
             </details>
 
 
-            {# ============================================================ #}
-            {# SECTION : ÉTAPES GÉNÉRALES                                  #}
-            {# ============================================================ #}
+            {# --- Instructions générales --- #}
             <details class="mb-3" open>
               <summary class="text-primary fw-bold" style="cursor:pointer;">
                 Étapes générales ({{ item.instructions|length }})
@@ -118,9 +112,7 @@
             </details>
 
 
-            {# ============================================================ #}
-            {# SECTION : ÉTAPES COMPANION                                  #}
-            {# ============================================================ #}
+            {# --- Étapes Companion --- #}
             <details class="mb-3" open>
               <summary class="text-primary fw-bold" style="cursor:pointer;">
                 Étapes Companion ({{ item.etapes_companion|length }})
@@ -136,20 +128,17 @@
             </details>
 
 
-            {# ============================================================ #}
-            {# SECTION : ASTUCE                                            #}
-            {# ============================================================ #}
+            {# --- Astuce --- #}
             {% if item.astuce %}
             <details class="mb-3" open>
               <summary class="text-primary fw-bold" style="cursor:pointer;">
                 Astuce
               </summary>
 
-              <div class="bg-light p-3 rounded mt-2">
-                <pre class="small mb-0" style="white-space: pre-wrap;">
+              <pre class="bg-light p-3 rounded small mt-2"
+                   style="white-space: pre-wrap;">
 {{ item.astuce }}
-                </pre>
-              </div>
+              </pre>
             </details>
             {% endif %}
 

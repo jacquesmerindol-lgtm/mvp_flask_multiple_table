@@ -1,34 +1,123 @@
+{# ========================================================================= #}
+{# INDEX.HTML — Page d’accueil                                                #}
+{# Application : Listes de recettes mon companion et moi                      #}
+{# ========================================================================= #}
+
 {% extends "base.html" %}
 
-{% block title %}Accueil - MVP Flask Multiple Table{% endblock %}
+{% block title %}Accueil — Listes de recettes mon companion et moi{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
-  <h1>Bienvenue sur le MVP Flask</h1>
-  <p class="lead">Gérez vos livres de cuisine et recettes avec une architecture propre et modulaire.</p>
 
-  <div class="mt-4">
-    <a href="{{ url_for('livres.index') }}" class="btn btn-primary me-2">
-      📚 Voir les livres
-    </a>
-    <a href="{{ url_for('recettes.index') }}" class="btn btn-success">
-      🍽️ Voir les recettes
-    </a>
-    <a href="{{ url_for('courses.index') }}" class="btn btn-secondary">
-      🛒 Voir la liste
-    </a>
-  </div>
+<div class="py-4">
 
-  <hr class="my-5" />
+    {# --------------------------------------------------------------------- #}
+    {# TITRE PRINCIPAL                                                       #}
+    {# --------------------------------------------------------------------- #}
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Listes de recettes<br>mon companion et moi</h1>
+        <p class="text-muted fs-5 mt-3">
+            Votre assistant pour gérer vos recettes, sélectionner vos plats, 
+            et générer automatiquement vos listes de courses.
+        </p>
+    </div>
 
-  <h4>Endpoints debug (API REST)</h4>
-  <p class="text-muted">Pour tester les opérations CRUD en JSON.</p>
 
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item"><code>GET /debug/livres</code></li>
-    <li class="list-group-item"><code>POST /debug/livres</code></li>
-    <li class="list-group-item"><code>GET /debug/recettes</code></li>
-    <li class="list-group-item"><code>POST /debug/recettes</code></li>
-  </ul>
+    {# --------------------------------------------------------------------- #}
+    {# SECTIONS PRINCIPALES                                                  #}
+    {# --------------------------------------------------------------------- #}
+    <div class="row g-4">
+
+        {# ========================== FONCTIONS MÉTIER ====================== #}
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">⚙️ Fonctions métier</h4>
+                    <p class="text-muted">
+                        Les actions principales pour importer, structurer et exploiter vos recettes.
+                    </p>
+
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <a href="{{ url_for('ocr.init_ui') }}" class="text-decoration-none">
+                                📤 Importer des images (OCR)
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('ocr.structuration_ui') }}" class="text-decoration-none">
+                                🧩 Structuration des données
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('recettes_ui.select_ui') }}" class="text-decoration-none">
+                                📋 Sélection de recettes
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('list_courses.generate') }}" class="text-decoration-none">
+                                📝 Générer une liste de courses
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        {# ========================== ÉTATS / SYNTHÈSES ====================== #}
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">📊 États / Synthèses</h4>
+                    <p class="text-muted">
+                        Consultez vos résultats, historiques et synthèses.
+                    </p>
+
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <a href="{{ url_for('courses.index') }}" class="text-decoration-none">
+                                🧾 Historique des listes de courses
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        {# ========================== DONNÉES (TABLES) ======================= #}
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">📚 Données</h4>
+                    <p class="text-muted">
+                        Gérez vos référentiels : recettes, livres, courses.
+                    </p>
+
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <a href="{{ url_for('livres.index') }}" class="text-decoration-none">
+                                📖 Livres
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('recettes.index') }}" class="text-decoration-none">
+                                🍽️ Recettes
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('courses.index') }}" class="text-decoration-none">
+                                🧾 Courses (table)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}
+gi

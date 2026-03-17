@@ -1,61 +1,107 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container mt-4">
 
-  <h2>Résultats du traitement OCR</h2>
-
-  <!-- Boutons de navigation -->
-  <div class="mt-3 mb-4">
-    <a href="{{ url_for('ocr.init_ui') }}" class="btn btn-secondary me-2">
-      🔄 Refaire une saisie
-    </a>
-
-    <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
-      🏠 Retour à l'accueil
-    </a>
-
-    <!-- Nouveau bouton : structuration -->
-    <form action="{{ url_for('ocr.structuration_ui') }}" method="post" class="d-inline">
-      <button type="submit" class="btn btn-success">
-        🧩 Structurer les données
-      </button>
-    </form>
+{# ============================================================ #}
+{# SECTION : TITRE                                              #}
+{# ============================================================ #}
+<section class="py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2 class="mb-3">Résultats du traitement OCR</h2>
+      </div>
+    </div>
   </div>
+</section>
 
-  {% for item in results.root %}
-  <div class="card shadow-sm mt-4">
-    <div class="card-body">
 
-      <h5 class="card-title">{{ item.image_path }}</h5>
+{# ============================================================ #}
+{# SECTION : ACTIONS / NAVIGATION                               #}
+{# ============================================================ #}
+<section class="py-2">
+  <div class="container">
+    <div class="row">
+      <div class="col d-flex flex-wrap gap-3">
 
-      <!-- Markdown brut -->
-      <h6 class="mt-3">Markdown brut</h6>
-      <details class="mt-2" open>
-        <summary class="text-primary" style="cursor: pointer;">Afficher / masquer le contenu complet</summary>
-        <pre class="bg-light p-3 rounded small mt-2"
-             style="max-height: 18rem; overflow-y: auto; white-space: pre-wrap;">
+        <a href="{{ url_for('ocr.init_ui') }}" class="btn btn-secondary">
+          🔄 Refaire une saisie
+        </a>
+
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+          🏠 Retour à l'accueil
+        </a>
+
+        <form action="{{ url_for('ocr.structuration_ui') }}" method="POST">
+          <button type="submit" class="btn btn-success">
+            🧩 Structurer les données
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{# ============================================================ #}
+{# SECTION : LISTE DES RÉSULTATS OCR                            #}
+{# ============================================================ #}
+<section class="py-3">
+  <div class="container">
+    <div class="row">
+
+      {% for item in results.ocr_results_items %}
+      <div class="col-12 mb-4">
+
+        <div class="card shadow-sm">
+
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">{{ item.image_path }}</h5>
+          </div>
+
+          <div class="card-body">
+
+            {# --- Markdown brut --- #}
+            <details class="mb-3" open>
+              <summary class="text-primary fw-bold" style="cursor:pointer;">
+                Markdown brut
+              </summary>
+
+              <div class="bg-light p-3 rounded mt-2">
+                <pre class="small mb-0" style="white-space: pre-wrap; max-height: 18rem; overflow-y: auto;">
 {{ item.md_data }}
-        </pre>
-      </details>
+                </pre>
+              </div>
+            </details>
 
-      <!-- Markdown amélioré -->
-      <h6 class="mt-3">Markdown amélioré (LLM)</h6>
-      {% if item.enhanced_md %}
-        <details class="mt-2">
-          <summary class="text-primary" style="cursor: pointer;">Afficher / masquer le contenu complet</summary>
-          <pre class="bg-light p-3 rounded small mt-2"
-               style="max-height: 18rem; overflow-y: auto; white-space: pre-wrap;">
+
+            {# --- Markdown amélioré (LLM) --- #}
+            <details class="mb-3">
+              <summary class="text-primary fw-bold" style="cursor:pointer;">
+                Markdown amélioré (LLM)
+              </summary>
+
+              {% if item.enhanced_md %}
+              <div class="bg-light p-3 rounded mt-2">
+                <pre class="small mb-0" style="white-space: pre-wrap; max-height: 18rem; overflow-y: auto;">
 {{ item.enhanced_md }}
-          </pre>
-        </details>
-      {% else %}
-        <p class="text-muted fst-italic">Aucune amélioration LLM n’a été générée.</p>
-      {% endif %}
+                </pre>
+              </div>
+              {% else %}
+              <p class="text-muted fst-italic mt-2">
+                Aucune amélioration LLM n’a été générée.
+              </p>
+              {% endif %}
+            </details>
+
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
 
     </div>
   </div>
-  {% endfor %}
+</section>
 
-</div>
 {% endblock %}

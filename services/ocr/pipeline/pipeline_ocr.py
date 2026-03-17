@@ -8,8 +8,14 @@
 # Objectif : garder routes.py ultra-léger et isoler toute la logique métier ici.
 
 import tempfile
+from typing import List
+from flask import request
 # from services.ocr.ocr_processor import PaddleOCRProcessor
 from services.service_instance import ocr_processor
+from services.ocr.ocr_processor import OCRResults
+from app.redis_client import redis_client  # si tu as un client Redis
+
+import json
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +64,7 @@ from services.service_instance import ocr_processor
 # Flask fournit les fichiers uploadés sous forme d'objets FileStorage.
 # PaddleOCR ne sait traiter que des chemins de fichiers (str).
 # On convertit donc chaque upload en fichier temporaire sur le disque.
-def save_uploaded_files(files):
+def save_uploaded_files(files)-> List[str]:
     """
     Convertit une liste de FileStorage (upload Flask) en chemins de fichiers temporaires.
     Retourne une liste de chemins utilisables par PaddleOCR.
@@ -87,7 +93,7 @@ def save_uploaded_files(files):
 #   2. la récupération du processor (singleton)
 #   3. l'exécution du pipeline OCR (défini dans ocs
 # r_processor.py)
-def run_pipeline_ocr(files, use_llm=True):
+def run_pipeline_ocr(files, use_llm: bool = True) -> OCRResults:
     """
     Pipeline OCR complet :
     - Convertit les fichiers uploadés en fichiers temporaires
@@ -95,6 +101,9 @@ def run_pipeline_ocr(files, use_llm=True):
     - Exécute le pipeline OCR sur les images
     - Retourne les résultats prêts pour le template
     """
+    # 1. Identifiant utilisateur stateless (cookie)
+    user_id = request.cookies.get("user_id")
+
     # Étape 1 : conversion FileStorage → chemins temporaires
     paths = save_uploaded_files(files)
 
@@ -102,4 +111,19 @@ def run_pipeline_ocr(files, use_llm=True):
     ocr_processor.use_llm = use_llm
 
     # Étape 3 : exécution du pipeline OCR défini dans PaddleOCRProcessor
-    return ocr_processor.run(paths)
+    results: OCRResults = ocr_processor.run(paths)
+    # return ocr_processor.run(paths)
+
+    # 5. Stockage dans Redis (stateless)    
+    redis_client.set(
+        f"ocr:{user_id}:input",
+        json.dumps(paths)  # ou autre format
+    )
+
+
+    redis_client.set(
+        f"ocr:{user_id}:output",
+        results.model_dump_json()
+    )
+
+    return results

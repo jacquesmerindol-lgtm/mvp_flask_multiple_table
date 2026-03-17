@@ -7,6 +7,9 @@ from services.list_course.schema import (
 )
 from services.service_instance import serviceListeCourse
 
+from flask import request
+
+
 
 # Imports LangChain
 
@@ -62,12 +65,15 @@ from services.service_instance import serviceListeCourse
 from app.redis_client import redis_client
 
 def pipeline_liste_course(data: ListeRecetteSelection) -> ListeCourse:
-    # 🔥 Récupération du workflow_id global
-    workflow_id = current_app.config["WORKFLOW_ID"]
+    # # 🔥 Récupération du workflow_id global
+    # workflow_id = current_app.config["WORKFLOW_ID"]
+
+    # 1. Identifiant utilisateur stateless (cookie)
+    user_id = request.cookies.get("user_id")
 
     # Stockage input
     redis_client.set(
-        f"liste_course:{workflow_id}:input",
+        f"courses:{user_id}:input",
         data.model_dump_json()
     )
 
@@ -76,7 +82,7 @@ def pipeline_liste_course(data: ListeRecetteSelection) -> ListeCourse:
 
     # Stockage output
     redis_client.set(
-        f"liste_course:{workflow_id}:output",
+        f"courses:{user_id}:output",
         output.model_dump_json()
     )
 

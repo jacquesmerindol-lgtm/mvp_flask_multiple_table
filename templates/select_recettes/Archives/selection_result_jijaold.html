@@ -32,10 +32,10 @@
 
         <form method="POST" action="{{ url_for('recettes_ui.update_selection') }}">
 
-          <div class="card shadow-sm">
+          <div class="card">
             <div class="table-responsive">
 
-              <table class="table table-striped table-hover mb-0">
+              <table class="table table-striped mb-0">
 
                 <thead class="table-dark">
                   <tr>
@@ -47,6 +47,7 @@
 
                 <tbody>
                   {% for item in selected_data %}
+
                   <tr>
 
                     <td>{{ recette_map[item.id_recette] }}</td>
@@ -60,9 +61,7 @@
                     </td>
 
                     <td>
-                      <button name="delete"
-                              value="{{ item.id_recette }}"
-                              class="btn btn-danger btn-sm">
+                      <button name="delete" value="{{ item.id_recette }}" class="btn btn-danger btn-sm">
                         Supprimer
                       </button>
                     </td>

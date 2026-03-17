@@ -1,69 +1,122 @@
 {% extends "base.html" %}
-{% from "bootstrap5/form.html" import render_form %}
-
 {% block content %}
-<div class="container mt-4">
 
-    <h2>Résultat de la liste des courses</h2>
-    <!-- Boutons de navigation -->
-    <div class="mt-3 mb-4"> 
-        <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
-            🏠 Retour à l'accueil
+{# ============================================================ #}
+{# SECTION : TITRE                                              #}
+{# ============================================================ #}
+<section class="py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2 class="mb-4">Résultat de la liste des courses</h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{# ============================================================ #}
+{# SECTION : ACTIONS / NAVIGATION                               #}
+{# ============================================================ #}
+<section class="py-2">
+  <div class="container">
+    <div class="row">
+      <div class="col d-flex flex-wrap gap-3">
+
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+          🏠 Retour à l'accueil
         </a>
-    
-        <!-- Nouveau bouton : Liste courses -->
-        <form action="{{ url_for('list_courses.generate') }}" method="post" class="d-inline">
-        <button type="submit" class="btn btn-success">
+
+        <form action="{{ url_for('list_courses.generate') }}" method="POST">
+          <button type="submit" class="btn btn-success">
             📝 Générer une liste de courses
-        </button>
+          </button>
         </form>
+
+      </div>
     </div>
+  </div>
+</section>
 
-    {% if results %}
-    <div class="card shadow-sm mt-4">
 
-        <div class="card-header bg-primary text-white">
+{# ============================================================ #}
+{# SECTION : LISTE DES COURSES                                  #}
+{# ============================================================ #}
+<section class="py-3">
+  <div class="container">
+    <div class="row">
+
+      {% if results %}
+      <div class="col-12">
+
+        <div class="card shadow-sm">
+
+          <div class="card-header bg-primary text-white">
             <h5 class="mb-0">
-                Liste des courses — {{ results.date_liste_course}}
+              Liste des courses — {{ results.date_liste_course }}
             </h5>
-        </div>
+          </div>
 
-        <div class="card-body"> 
-            <!-- Date de la Liste recettes -->
-            <p><strong>Date de la liste de courses:</strong> {{ results.date_liste_course}}</p>
-            
-            <!-- Liste recettes -->
-            <details open class="mb-3">
-                <summary class="text-primary" style="cursor:pointer;">
-                    Liste des recettes ({{ results.liste_recette|length }})
-                </summary>
-                <pre class="bg-light p-3 rounded small mt-2"
-                    style="max-height: 10rem; overflow-y: auto; white-space: pre-wrap;">
-    {% for r in results.liste_recette %}
-    - {{ r.nom_recette }} ({{ r.nom_livre }}) ({{ r.numero_livre }})
-    {% endfor %}
+          <div class="card-body">
+
+            {# ============================================================ #}
+            {# SECTION : INFOS GÉNÉRALES                                   #}
+            {# ============================================================ #}
+            <div class="mb-3">
+              <p><strong>Date de la liste de courses :</strong> {{ results.date_liste_course }}</p>
+            </div>
+
+
+            {# ============================================================ #}
+            {# SECTION : LISTE DES RECETTES                                 #}
+            {# ============================================================ #}
+            <details class="mb-3" open>
+              <summary class="text-primary fw-bold" style="cursor:pointer;">
+                Liste des recettes ({{ results.liste_recette|length }})
+              </summary>
+
+              <div class="bg-light p-3 rounded mt-2">
+                <ul class="mb-0">
+                  {% for r in results.liste_recette %}
+                    <li>
+                      {{ r.nom_recette }} ({{ r.nom_livre }}) — n° {{ r.numero_livre }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </details>
+
+
+            {# ============================================================ #}
+            {# SECTION : LISTE DES COURSES                                  #}
+            {# ============================================================ #}
+            <details class="mb-3" open>
+              <summary class="text-primary fw-bold" style="cursor:pointer;">
+                Liste des courses ({{ results.liste_course|length }})
+              </summary>
+
+              <div class="bg-light p-3 rounded mt-2">
+                <pre class="small mb-0" style="white-space: pre-wrap; max-height: 12rem; overflow-y: auto;">
+{{ results.liste_course }}
                 </pre>
+              </div>
             </details>
 
-            <!-- liste des courses -->
-            <details open class="mb-3">
-                <summary class="text-primary" style="cursor:pointer;">
-                    Liste des courses ({{ results.liste_course|length }})
-                </summary>
-                <pre class="bg-light p-3 rounded small mt-2"
-                    style="max-height: 8rem; overflow-y: auto; white-space: pre-wrap;">
-    {{ results.liste_course }}
-                    </pre>
-            </details>
+          </div>
         </div>
-    </div>
 
-    {% else %}
-    <div class="alert alert-info mt-4">
-        Aucune liste de courses n’a encore été générée.
-    </div>
-    {% endif %}
+      </div>
 
-</div>
+      {% else %}
+      <div class="col-12">
+        <div class="alert alert-info">
+          Aucune liste de courses n’a encore été générée.
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
 
 {% endblock %}

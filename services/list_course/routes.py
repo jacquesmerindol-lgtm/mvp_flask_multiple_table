@@ -24,17 +24,19 @@ from app.redis_client import redis_client
 ingredients_bp = Blueprint("recettes_ui", __name__, url_prefix="/ingredients")
 
 def load_selection_from_redis() -> ListeRecetteSelection:
-    workflow_id = current_app.config["WORKFLOW_ID"]
-    raw = redis_client.get(f"liste_course:{workflow_id}:selection")
+    # workflow_id = current_app.config["WORKFLOW_ID"]
+    user_id = request.cookies.get("user_id")
+    raw = redis_client.get(f"courses:{user_id}:selection")
     if not raw:
         return ListeRecetteSelection(recette_selection_items=[])
     return ListeRecetteSelection.model_validate_json(raw)
 
 
 def save_selection_to_redis(selection: ListeRecetteSelection) -> None:
-    workflow_id = current_app.config["WORKFLOW_ID"]
+    # workflow_id = current_app.config["WORKFLOW_ID"]
+    user_id = request.cookies.get("user_id")
     redis_client.set(
-        f"liste_course:{workflow_id}:selection",
+        f"courses:{user_id}:selection",
         selection.model_dump_json()
     )
 
@@ -328,8 +330,10 @@ def generate():
     # ------------------------------------------------------------------
     # GET : afficher le dernier résultat stocké dans Redis
     # ------------------------------------------------------------------
-    workflow_id = current_app.config["WORKFLOW_ID"]
-    raw = redis_client.get(f"liste_course:{workflow_id}:output")
+    # workflow_id = current_app.config["WORKFLOW_ID"]
+    # raw = redis_client.get(f"liste_course:{workflow_id}:output")
+    user_id = request.cookies.get("user_id")
+    raw = redis_client.get(f"courses:{user_id}:output")
 
     results = None
     if raw:

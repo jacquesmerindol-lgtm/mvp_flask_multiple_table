@@ -244,7 +244,7 @@
 
 from paddleocr import PPStructureV3
 import subprocess
-from typing import List, TypedDict
+from typing import List
 import base64
 import re
 import traceback
@@ -272,13 +272,37 @@ ImageFilePaths = List[str]
 
 # OCRResults = List[OCRResult]
 
+# class OCRResult(BaseModel):
+#     image_path: str = ""
+#     md_data: str = ""
+#     enhanced_md: str = Field(default="", description="Markdown amélioré par LLM (optionnel)")
+
+# class OCRResults(RootModel[List[OCRResult]]):
+#     pass
+
 class OCRResult(BaseModel):
+    """
+    Représente le résultat OCR d’un seul document (image ou PDF).
+    """
     image_path: str = ""
     md_data: str = ""
-    enhanced_md: str = Field(default="", description="Markdown amélioré par LLM (optionnel)")
+    enhanced_md: str = Field(
+        default="",
+        description="Markdown amélioré par LLM (optionnel)"
+    )
 
-class OCRResults(RootModel[List[OCRResult]]):
-    pass
+
+class OCRResults(BaseModel):
+    """
+    Version stateless et explicite :
+    - Remplace RootModel[List[OCRResult]]
+    - Ajoute une propriété claire : ocr_results_items
+    - Compatible JSON / Redis / API
+    """
+    ocr_results_items: List[OCRResult] = Field(
+        default_factory=list,
+        description="Liste des résultats OCR"
+    )
 
 
 # ---------------------------------------------------------
@@ -310,6 +334,12 @@ class PaddleOCRProcessor:
     - Amélioration LLM (optionnel)
     - Gestion d’erreurs centralisée via @safe
     """
+    """
+    Version stateless :
+    - Aucun stockage interne de l’état d’un run
+    - Chaque appel à run() est indépendant
+    - La classe ne conserve que la configuration et le pipeline OCR
+    """
 
     def __init__(
         self,
@@ -323,6 +353,7 @@ class PaddleOCRProcessor:
         use_api_key: str = "lm-studio",
         use_temperature: float = 0.0,
     ):
+        # Configuration immuable
         self.lang = lang
         self.use_doc_orientation_classify = use_doc_orientation_classify
         self.use_doc_unwarping = use_doc_unwarping
@@ -335,11 +366,12 @@ class PaddleOCRProcessor:
         self.use_api_key = use_api_key
         self.use_temperature = use_temperature
 
+        # Pipeline OCR (stateless)
         self.pipeline = self._init_pipeline()
             
         # Propriétés internes - toujours initialisées
-        self._input_model: ImageFilePaths = []
-        self._output_model: OCRResults = []
+        # self._input_model: ImageFilePaths = []
+        # self._output_model: OCRResults = []
 
 
     # ---------------------------------------------------------
@@ -442,8 +474,13 @@ class PaddleOCRProcessor:
     # ---------------------------------------------------------
     @safe(default_return=[])
     def run(self, image_paths: ImageFilePaths) -> OCRResults:
-        self._input_model = image_paths
-        collected = []   # liste Python temporaire
+        # self._input_model = image_paths
+        """
+        Version stateless :
+        - Ne stocke rien dans l’objet
+        - Retourne directement OCRResults
+        """
+        collected: List[OCRResult] = []
 
         for image_path in image_paths:
             # PP-StructureV3 accepte directement les PDF et les images
@@ -451,7 +488,10 @@ class PaddleOCRProcessor:
                 raw = self.pipeline.predict(image_path)
             except Exception as e:
                 self.log_error(f"Erreur PaddleOCR sur l’entrée : {image_path}", e)
-                results.append(
+                # results.append(
+                #     {"image_path": image_path, "md_data": "", "enhanced_md": ""}
+                # )
+                collected.append(
                     {"image_path": image_path, "md_data": "", "enhanced_md": ""}
                 )
                 continue
@@ -464,20 +504,39 @@ class PaddleOCRProcessor:
                 md_clean = self.remove_markdown_images(md_clean)
                 markdown_list.append(md_clean)
 
-            markdown_texts = self.safe_concatenate_markdown(markdown_list)
+            # markdown_texts = self.safe_concatenate_markdown(markdown_list)
 
-            result_item = OCRResult(
-                image_path=image_path,
-                md_data=markdown_texts,
-                enhanced_md=self.enhance_with_llm(image_path, markdown_texts)
+            # result_item = OCRResult(
+            #     image_path=image_path,
+            #     md_data=markdown_texts,
+            #     enhanced_md=self.enhance_with_llm(image_path, markdown_texts)
+            #     if self.use_llm else ""
+            # )
+
+            # collected.append(result_item)
+
+            md_final = self.safe_concatenate_markdown(markdown_list)
+
+            enhanced = (
+                self.enhance_with_llm(image_path, md_final)
                 if self.use_llm else ""
             )
 
-            collected.append(result_item)
+            collected.append(
+                OCRResult(
+                    image_path=image_path,
+                    md_data=md_final,
+                    enhanced_md=enhanced
+                )
+            )
         
-        # 🔥 Conversion finale en objet Pydantic
-        self._output_model = OCRResults(root=collected)
-        return self._output_model
+        # # 🔥 Conversion finale en objet Pydantic
+        # self._output_model = OCRResults(root=collected)
+        # return self._output_model
+
+        # Retour direct → stateless
+        return OCRResults(ocr_results_items=collected)
+            
 
     # ---------------------------------------------------------
     #  LLM Enhancement (gère images et PDF)

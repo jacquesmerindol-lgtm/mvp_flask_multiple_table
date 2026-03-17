@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session
+from flask import Flask, render_template, make_response, request
 
 from config import get_settings
 from database import Base, engine
@@ -35,12 +35,24 @@ def create_app():
     app.config["SECRET_KEY"] = settings.SECRET_KEY
     app.config["WTF_CSRF_ENABLED"] = True
 
-    # Création d’un workflow global
-    app.config["WORKFLOW_ID"] = str(uuid.uuid4())
-    print(f"[INIT] WORKFLOW_ID = {app.config['WORKFLOW_ID']}")
+    # # Création d’un workflow global
+    # app.config["WORKFLOW_ID"] = str(uuid.uuid4())
+    # print(f"[INIT] WORKFLOW_ID = {app.config['WORKFLOW_ID']}")
+    @app.before_request
+    def ensure_user_id():
+        if "user_id" not in request.cookies:
+            new_id = str(uuid.uuid4())
+            resp = make_response("")
+            resp.set_cookie(
+                "user_id",
+                new_id,
+                max_age=60*60*24*365,  # 1 an
+                httponly=True,
+                samesite="Lax"
+            )
+            return resp
 
     # Bootstrap-Flask
-    from flask_bootstrap import Bootstrap
     Bootstrap5(app)
 
     # Création des tables
@@ -69,10 +81,10 @@ def create_app():
         except:
             return []
         
-    @app.route("/reset_session")
-    def reset_session():
-        session.clear()
-        return "Session reset"
+    # @app.route("/reset_session")
+    # def reset_session():
+    #     session.clear()
+    #     return "Session reset"
 
     return app
 

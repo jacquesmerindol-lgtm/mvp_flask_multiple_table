@@ -1,14 +1,24 @@
 # services/ocr/routes.py
 
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for
 from services.ocr.forms import ImageInitForm, SelectLivreForm
 from services.ocr.pipeline.pipeline_ocr import run_pipeline_ocr
 from services.ocr.pipeline.pipeline_structuration import run_pipeline_structuration
 from services.ocr.pipeline.pipeline_save_db import run_pipeline_save_recettes
 from services.ocr.ocr_processor import OCRResults #à corriger par la suite avec schemas
+from services.ocr.structuration import Recette
 from services.service_instance import ocr_processor, structuration_processor
 from services.ocr.utils import get_livres_choices
+from app.redis_client import redis_client
+import json
 
+from services.ocr.redis_store import (
+    load_ocr_from_redis,
+    load_structuration_from_redis,
+    save_structuration_to_redis,
+    save_selected_livre_to_redis,
+    load_selected_livre_from_redis,
+)
 
 
 bp = Blueprint("ocr", __name__, url_prefix="/ocr")
@@ -50,8 +60,6 @@ def init_ui():
     # GET → afficher le formulaire
     return render_template("ocr/ocr_init.html")
 
-
-
 # @bp.route("/structuration", methods=["POST"])
 # def structuration_ui():
 #     # Récupération des résultats OCR depuis la session
@@ -73,20 +81,29 @@ def init_ui():
 #     # Affichage dans le template dédié
 #     return render_template("ocr/structuration_results.html", results=structured)
 
+from app.redis_client import redis_client
+
+
 @bp.route("/structuration", methods=["POST"])
 def structuration_ui():
     # 1) Récupération du résultat OCR depuis le processor
-    ocr_results = ocr_processor._output_model
-    print("Type OCR result dans endpoint : ", type(ocr_results))
+    # ocr_results = ocr_processor._output_model
+    # 1) Charger OCR depuis Redis
+    ocr_results = load_ocr_from_redis()
+    if not ocr_results:
+        return "Aucun résultat OCR disponible.", 400
 
-    if ocr_results is None:
-        return "Aucun résultat OCR disponible. Veuillez relancer l'analyse.", 400
+    # if ocr_results is None:
+    #     return "Aucun résultat OCR disponible. Veuillez relancer l'analyse.", 400
 
     # 2) Exécution du pipeline de structuration
     structured = run_pipeline_structuration(
         ocr_results,
         schema_name="Recette"
     )
+
+    # 3) Sauvegarde Redis
+    save_structuration_to_redis(structured)
 
     # 3) Affichage dans le template
     return render_template(
@@ -113,7 +130,8 @@ def structuration_ui():
 @bp.route("/select_livre", methods=["GET", "POST"])
 def select_livre_ui():
     # 1) Récupération des données structurées depuis le processor
-    structured = structuration_processor._output_model
+    # structured = structuration_processor._output_model
+    structured = load_structuration_from_redis()
 
     if not structured:
         return "Aucune donnée structurée disponible.", 400
@@ -127,8 +145,8 @@ def select_livre_ui():
             return "Aucun livre sélectionné.", 400
 
         # 3) Stocker l’ID du livre choisi (session OK ici)
-        session["selected_livre"] = int(selected_id)
-
+        # session["selected_livre"] = int(selected_id)
+        save_selected_livre_to_redis(int(selected_id))
         return redirect(url_for("ocr.save_structured_ui"))
 
     # 4) GET → afficher la page
@@ -151,10 +169,14 @@ def select_livre_ui():
 @bp.route("/save", methods=["GET", "POST"])
 def save_structured_ui():
     # 1) Récupération des recettes structurées depuis le processor
-    structured = structuration_processor._output_model
+    # structured = structuration_processor._output_model
+     # 1) Charger OCR depuis Redis
+    structured = load_structuration_from_redis()
+    id_livre_reference = load_selected_livre_from_redis()
 
     # 2) Récupération de l’ID du livre depuis la session (léger → OK)
-    id_livre_reference = session.get("selected_livre")
+    # id_livre_reference = session.get("selected_livre")
+
 
     if not structured or not id_livre_reference:
         return "Données manquantes.", 400

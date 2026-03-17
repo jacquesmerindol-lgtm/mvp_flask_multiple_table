@@ -268,8 +268,8 @@ class StructurationLLM:
         )
 
         # Propriétés internes - toujours initialisées
-        self._input_model: OCRResults | None = None
-        self._output_model: list[BaseModel] | None = None
+        # self._input_model: OCRResults | None = None
+        # self._output_model: list[BaseModel] | None = None
 
 
         # Prompt de structuration
@@ -326,12 +326,12 @@ Fieldname du fichier texte :
 
         return chain.invoke({"texte": texte})
     
-    def run(self, OCR_results: OCRResults) :
-        self._input_model = OCR_results
-        structured_items = [] 
-        print("TYPE OCR:", type(OCR_results))
+    def run(self, OCR_results: OCRResults) -> list[BaseModel]:
+        # self._input_model = OCR_results
+        structured_items : list[BaseModel] = []
+        # print("TYPE OCR:", type(OCR_results))
 
-        for item in OCR_results.root:
+        for item in OCR_results.ocr_results_items:
             # 1) Récupération du texte OCR à structurer
             texte = item.enhanced_md or item.md_data
 
@@ -346,8 +346,11 @@ Fieldname du fichier texte :
             structured_items.append(recette)
         
         # Construire le modèle Pydantic
-        self._output_model = structured_items
-        return self._output_model
+        # self._output_model = structured_items
+        # return self._output_model
+        return structured_items
+
+
 
 # ---------------------------------------------------------
 #  MAIN (DEBUG StructurationLLM)
