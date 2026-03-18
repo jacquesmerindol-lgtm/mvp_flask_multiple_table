@@ -15,6 +15,7 @@ from models import Recette
 from config import get_settings
 settings = get_settings()
 
+import ast
 import json
 
 
@@ -177,7 +178,7 @@ def update_ui(id_recette):
                 instructions_list = json.loads(instructions_raw.replace("'", '"'))
             except json.JSONDecodeError: 
                 flash("Les champs doivent contenir du JSON valide.", "danger")
-                return render_template("recetes/edit.html", form=form, recette=recette)
+                return render_template("recettes/edit.html", form=form, recette=recette)
 
             data = {
                 "nom_recette": form.nom_recette.data,
