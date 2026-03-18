@@ -18,10 +18,10 @@ from langchain_core.output_parsers import StrOutputParser
 
 # Imports Pydantic
 from pydantic import BaseModel, Field
-from services.list_course.schema import (
+from services.schema import (
     RecetteSelection,
     ListeCourse,
-    ListeRecetteSelection
+    ListeRecetteSelection,
 )
 #
 

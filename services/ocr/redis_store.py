@@ -1,8 +1,7 @@
 import json
 from flask import request
 from app.redis_client import redis_client
-from services.ocr.ocr_processor import OCRResults
-from services.ocr.structuration import Recette
+from services.schema import OCRResults, Recette
 
 
 def load_ocr_from_redis() -> OCRResults | None:

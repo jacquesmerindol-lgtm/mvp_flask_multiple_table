@@ -1,9 +1,9 @@
 from functools import wraps
 
-from services.list_course.schema import (
+from services.schema import (
     RecetteSelection,
     ListeCourse,
-    ListeRecetteSelection
+    ListeRecetteSelection,
 )
 from services.service_instance import serviceListeCourse
 

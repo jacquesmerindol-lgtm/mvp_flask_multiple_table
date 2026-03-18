@@ -1,66 +1,123 @@
 {% from "bootstrap5/form.html" import render_form %}
-
 {% extends "base.html" %}
 
 {% block title %}{{ course.date_liste_course }} — MVP Flask Multiple Table{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2>{{ course.date_liste_course }}</h2>
 
-  <div>
-    <!-- Bouton Modifier (GET) -->  
-    <a href="{{ url_for('courses.update_ui', id_course=course.id_course) }}"
-      class="btn btn-primary me-2">
-      ✏️ Modifier
-    </a>
-
-    <!-- Suppression via POST -->
-    <form method="POST"
-          action="{{ url_for('courses.delete_ui', id_course=course.id_course) }}"
-          class="d-inline"> 
-    {{ form_delete.hidden_tag() }}
-    <button class="btn btn-danger" id="deleteBtn">🗑️ Supprimer</button>
-    </form>
-  </div>
-</div>
-
-<!-- Vue détail -->
-<div id="detailView">
-    <p><strong>ID :</strong> {{ course.id_course }}</p>
-    <p><strong>Date :</strong> {{ course.date_liste_course }}</p>
-    {% if course.liste_recette %}
-        <h5>Recettes</h5>
-        <ul class="list-group list-group-flush">
-            {% for recette in course.liste_recette %}
-                <li class="list-group-item">
-                    {{ recette.nom_recette }} ({{ recette.type_recette }})
-                : {{ recette.nom_livre }} ({{ recette.numero_livre }})
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <p><strong>Liste ingrédients :</strong> {{ course.liste_ingredient }}</p>
-    <div class="mt-4">
-        <a href="{{ url_for('courses.index') }}" class="btn btn-secondary">⬅ Retour</a>
+{# ============================================================ #}
+{# SECTION : TITRE                                              #}
+{# ============================================================ #}
+<section class="py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2 class="mb-4">{{ course.date_liste_course }}</h2>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 
-<!-- Formulaire édition -->
-<div id="editForm" class="d-none mt-3">
-    <h5>Modifier la liste de course</h5>
+{# ============================================================ #}
+{# SECTION : ACTIONS / BOUTONS                                  #}
+{# ============================================================ #}
+<section class="py-2">
+  <div class="container">
+    <div class="row">
+      <div class="col d-flex flex-wrap gap-3">
+        <a href="{{ url_for('courses.index') }}" class="btn btn-secondary">
+          ⬅ Retour
+        </a>
 
-    {{ render_form(
-        form_edit,
-        action=url_for('courses.update_ui', id_course=course.id_course),
-        method='POST'
-    ) }}
-    <button type="button" id="discardBtn" class="btn btn-secondary mt-2">
-        ❌ Annuler
-    </button>
-</div>
+        <a href="{{ url_for('courses.update_ui', id_course=course.id_course) }}"
+           class="btn btn-warning">
+          ✏️ Modifier
+        </a>
+
+        <form method="POST"
+              action="{{ url_for('courses.delete_ui', id_course=course.id_course) }}"
+              class="d-inline">
+          {{ form_delete.hidden_tag() }}
+          <button type="submit" class="btn btn-danger">
+            🗑️ Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# SECTION : DÉTAILS DE LA LISTE DE COURSE                      #}
+{# ============================================================ #}
+<section class="py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="card shadow-sm">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Détails</h5>
+          </div>
+          <div class="card-body">
+
+            <p><strong>ID :</strong> {{ course.id_course }}</p>
+            <p><strong>Date :</strong> {{ course.date_liste_course }}</p>
+
+            {% if course.liste_recette %}
+              <div class="bg-light p-3 rounded mt-3">
+                <p class="mb-2"><strong>Recettes :</strong></p>
+                <ul class="mb-0">
+                  {% for recette in course.liste_recette %}
+                    <li>
+                      {{ recette.nom_recette }} ({{ recette.type_recette }})
+                      — {{ recette.nom_livre }} {{ recette.numero_livre or '' }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+
+            <div class="bg-light p-3 rounded mt-3">
+              <p class="mb-2"><strong>Liste ingrédients :</strong></p>
+              <p class="mb-0">{{ course.liste_ingredient }}</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# SECTION : FORMULAIRE DE MODIFICATION                         #}
+{# ============================================================ #}
+<section class="py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="card shadow-sm">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Modifier la liste de course</h5>
+          </div>
+          <div class="card-body">
+
+            {{ render_form(
+                form_edit,
+                action=url_for('courses.update_ui', id_course=course.id_course),
+                method='POST'
+            ) }}
+
+            <a href="{{ url_for('courses.detail', id_course=course.id_course) }}"
+               class="btn btn-secondary mt-2">
+              ❌ Annuler
+            </a>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 {% endblock %}
-
-
-

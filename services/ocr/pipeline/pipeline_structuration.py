@@ -23,7 +23,7 @@ import json
 from flask import request
 from app.redis_client import redis_client
 from services.service_instance import structuration_processor
-from services.ocr.ocr_processor import OCRResults
+from services.schema import OCRResults
 
 
 def run_pipeline_structuration(ocr_results: OCRResults, schema_name="Recette"):

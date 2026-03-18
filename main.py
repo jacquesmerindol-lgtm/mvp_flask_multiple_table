@@ -10,6 +10,7 @@ from routes import debug_livres_bp, debug_recettes_bp
 from routes.livres import livres_bp
 from routes.recettes import recettes_bp
 from routes.courses import courses_bp
+from routes.dashboard import dashboard_bp
 
 from services.ocr.routes import bp as ocr_bp
 from services.list_course.routes import ingredients_bp
@@ -68,6 +69,7 @@ def create_app():
     app.register_blueprint(ingredients_bp_simple)
     app.register_blueprint(courses_bp)
     app.register_blueprint(list_course_bp)
+    app.register_blueprint(dashboard_bp)
 
     # Page d'accueil
     @app.route("/")

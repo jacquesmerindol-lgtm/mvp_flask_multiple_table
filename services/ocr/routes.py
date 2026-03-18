@@ -5,8 +5,7 @@ from services.ocr.forms import ImageInitForm, SelectLivreForm
 from services.ocr.pipeline.pipeline_ocr import run_pipeline_ocr
 from services.ocr.pipeline.pipeline_structuration import run_pipeline_structuration
 from services.ocr.pipeline.pipeline_save_db import run_pipeline_save_recettes
-from services.ocr.ocr_processor import OCRResults #à corriger par la suite avec schemas
-from services.ocr.structuration import Recette
+from services.schema import OCRResults, Recette
 from services.service_instance import ocr_processor, structuration_processor
 from services.ocr.utils import get_livres_choices
 from app.redis_client import redis_client

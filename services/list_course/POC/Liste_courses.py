@@ -17,7 +17,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 # Imports Pydantic
-from pydantic import BaseModel, Field
+from services.schema import Ingredient, RecetteSelection, ListeCourse
 
 
 logger = logging.getLogger(__name__)
@@ -39,27 +39,27 @@ def safe(default_return=None):
     return decorator
 
 # ======================
-# MODÈLES PYDANTIC
+# ANCIENNES DÉFINITIONS (commentées)
 # ======================
 
-class Ingredient(BaseModel):
-    quantite: str =""
-    unite: str =""
-    ingredient: str
-
-class RecetteSelection(BaseModel):
-    id_recette: str
-    nb_recette: int
-    nom_livre: str
-    numero_livre: str =""
-    nom_recette: str
-    type_recette: str
-    liste_ingredients: list[Ingredient]
-
-class ListeCourse(BaseModel):
-    date_liste_course: datetime = Field(description="Date de la liste des courses")
-    liste_recette: list[RecetteSelection] = Field(description="Liste des recettes associées")
-    liste_course: str = Field(description="Liste des courses formatée")
+# class Ingredient(BaseModel):
+#     quantite: str =""
+#     unite: str =""
+#     ingredient: str
+#
+# class RecetteSelection(BaseModel):
+#     id_recette: str
+#     nb_recette: int
+#     nom_livre: str
+#     numero_livre: str =""
+#     nom_recette: str
+#     type_recette: str
+#     liste_ingredients: list[Ingredient]
+#
+# class ListeCourse(BaseModel):
+#     date_liste_course: datetime = Field(description="Date de la liste des courses")
+#     liste_recette: list[RecetteSelection] = Field(description="Liste des recettes associées")
+#     liste_course: str = Field(description="Liste des courses formatée")
 
 # ======================
 # CLASSE PRINCIPALE

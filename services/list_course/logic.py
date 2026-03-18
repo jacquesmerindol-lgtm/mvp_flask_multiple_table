@@ -1,7 +1,6 @@
 import json
-from services.list_course.schema import RecetteSelection, Ingredient
+from services.schema import RecetteSelection, Ingredient, ListeRecetteSelection, ListeRecetteQuantifiee
 from services.list_ingredients.crud import get_recettes_full_by_ids
-from services.list_course.schema import ListeRecetteSelection, ListeRecetteQuantifiee
 
 # services/list_ingredients/utils.py
 

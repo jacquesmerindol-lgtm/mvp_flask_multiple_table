@@ -12,7 +12,7 @@ from typing import List
 from flask import request
 # from services.ocr.ocr_processor import PaddleOCRProcessor
 from services.service_instance import ocr_processor
-from services.ocr.ocr_processor import OCRResults
+from services.schema import OCRResults
 from app.redis_client import redis_client  # si tu as un client Redis
 
 import json

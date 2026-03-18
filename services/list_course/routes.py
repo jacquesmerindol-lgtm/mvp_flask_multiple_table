@@ -14,7 +14,7 @@ from services.list_course.crud import (
 from services.list_course.logic import build_recette_map
 
 from services.service_instance import serviceListeCourse
-from services.list_course.schema import RecetteSelection, ListeRecetteSelection, RecetteQuantifiee, ListeRecetteQuantifiee, ListeCourse
+from services.schema import RecetteSelection, ListeRecetteSelection, RecetteQuantifiee, ListeRecetteQuantifiee, ListeCourse
 
 from app.redis_client import redis_client
 

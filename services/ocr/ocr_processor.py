@@ -255,54 +255,42 @@ from markdownify import markdownify as md
 from langchain_openai import ChatOpenAI
 from pdf2image import convert_from_path
 
-from pydantic import BaseModel, Field, RootModel
+from services.schema import OCRResult, OCRResults
 
 # ======================
-# MODÈLES PYDANTIC
+# MODÈLES PYDANTIC (définis dans services.schema)
 # ======================
 # Typings
 ImageFilePaths = List[str]
 
 
-# class OCRResult(TypedDict):
-#     image_path: str
-#     md_data: str
-#     enhanced_md: str  # Markdown amélioré par LLM (optionnel)
-
-
-# OCRResults = List[OCRResult]
-
+# Anciennes définitions locales (maintenues en commentaire pour historique)
+#
+# from pydantic import BaseModel, Field, RootModel
+#
 # class OCRResult(BaseModel):
+#     """
+#     Représente le résultat OCR d’un seul document (image ou PDF).
+#     """
 #     image_path: str = ""
 #     md_data: str = ""
-#     enhanced_md: str = Field(default="", description="Markdown amélioré par LLM (optionnel)")
-
-# class OCRResults(RootModel[List[OCRResult]]):
-#     pass
-
-class OCRResult(BaseModel):
-    """
-    Représente le résultat OCR d’un seul document (image ou PDF).
-    """
-    image_path: str = ""
-    md_data: str = ""
-    enhanced_md: str = Field(
-        default="",
-        description="Markdown amélioré par LLM (optionnel)"
-    )
-
-
-class OCRResults(BaseModel):
-    """
-    Version stateless et explicite :
-    - Remplace RootModel[List[OCRResult]]
-    - Ajoute une propriété claire : ocr_results_items
-    - Compatible JSON / Redis / API
-    """
-    ocr_results_items: List[OCRResult] = Field(
-        default_factory=list,
-        description="Liste des résultats OCR"
-    )
+#     enhanced_md: str = Field(
+#         default="",
+#         description="Markdown amélioré par LLM (optionnel)"
+#     )
+#
+#
+# class OCRResults(BaseModel):
+#     """
+#     Version stateless et explicite :
+#     - Remplace RootModel[List[OCRResult]]
+#     - Ajoute une propriété claire : ocr_results_items
+#     - Compatible JSON / Redis / API
+#     """
+#     ocr_results_items: List[OCRResult] = Field(
+#         default_factory=list,
+#         description="Liste des résultats OCR"
+#     )
 
 
 # ---------------------------------------------------------

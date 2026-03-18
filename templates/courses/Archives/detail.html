@@ -1,0 +1,66 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends "base.html" %}
+
+{% block title %}{{ course.date_liste_course }} — MVP Flask Multiple Table{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>{{ course.date_liste_course }}</h2>
+
+  <div>
+    <!-- Bouton Modifier (GET) -->  
+    <a href="{{ url_for('courses.update_ui', id_course=course.id_course) }}"
+      class="btn btn-primary me-2">
+      ✏️ Modifier
+    </a>
+
+    <!-- Suppression via POST -->
+    <form method="POST"
+          action="{{ url_for('courses.delete_ui', id_course=course.id_course) }}"
+          class="d-inline"> 
+    {{ form_delete.hidden_tag() }}
+    <button class="btn btn-danger" id="deleteBtn">🗑️ Supprimer</button>
+    </form>
+  </div>
+</div>
+
+<!-- Vue détail -->
+<div id="detailView">
+    <p><strong>ID :</strong> {{ course.id_course }}</p>
+    <p><strong>Date :</strong> {{ course.date_liste_course }}</p>
+    {% if course.liste_recette %}
+        <h5>Recettes</h5>
+        <ul class="list-group list-group-flush">
+            {% for recette in course.liste_recette %}
+                <li class="list-group-item">
+                    {{ recette.nom_recette }} ({{ recette.type_recette }})
+                : {{ recette.nom_livre }} ({{ recette.numero_livre }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <p><strong>Liste ingrédients :</strong> {{ course.liste_ingredient }}</p>
+    <div class="mt-4">
+        <a href="{{ url_for('courses.index') }}" class="btn btn-secondary">⬅ Retour</a>
+    </div>
+</div>
+
+<!-- Formulaire édition -->
+<div id="editForm" class="d-none mt-3">
+    <h5>Modifier la liste de course</h5>
+
+    {{ render_form(
+        form_edit,
+        action=url_for('courses.update_ui', id_course=course.id_course),
+        method='POST'
+    ) }}
+    <button type="button" id="discardBtn" class="btn btn-secondary mt-2">
+        ❌ Annuler
+    </button>
+</div>
+
+{% endblock %}
+
+
+

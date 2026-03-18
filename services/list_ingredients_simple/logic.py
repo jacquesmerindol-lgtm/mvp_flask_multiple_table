@@ -1,5 +1,5 @@
 import json
-from services.list_ingredients_simple.schema import RecetteSelection, Ingredient
+from services.schema import RecetteSelection, Ingredient
 from services.list_ingredients_simple.crud import get_recettes_full_by_ids
 
 # services/list_ingredients/utils.py

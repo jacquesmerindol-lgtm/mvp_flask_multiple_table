@@ -135,7 +135,7 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Type
 
-from pydantic import BaseModel, Field, RootModel
+from services.schema import Ingredient, Recette, Facture, SCHEMAS, OCRResult, OCRResults
 from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -146,88 +146,86 @@ from langchain_openai import ChatOpenAI
 # 1. Modèle Pydantic : schéma final 
 # =========================================================
 
-# # ----scémas input--- from ocr processor 
-# class OCRResult(BaseModel):
-#     image_path: str = ""
-#     md_data: str = ""
-#     enhanced_md: str = Field(default="", description="Markdown amélioré par LLM (optionnel)")
-
-# class OCRResults(RootModel[List[OCRResult]]):
-#     pass
-from services.ocr.ocr_processor import OCRResults, OCRResult
+# Docs et historiques des schémas Pydantic utilisés par ce module.
+# Les définitions sont désormais centralisées dans `services.schema`.
 
 
-# --- Tes schémas ---
-class Ingredient(BaseModel):
-    ingredient: str = Field(description="Nom de l’ingrédient, sans quantité.")
-    quantite: str = Field(description="Quantité associée à l’ingrédient; répond non précisé si aucune quantité n'est mentionnée.")
-    unite : str = Field(description="Unité associée à l’ingrédient; répond par une chaine de caractèrevide si aucune unité n'est mentionnée.")
-
-
-class Recette(BaseModel):
-    lien_fichier: str = Field(
-        description="Chemin ou nom du fichier source."
-    )
-
-    nom_recette: str = Field(
-        description="Nom exact de la recette tel qu'indiqué dans le texte."
-    )
-
-    nombre_personnes: int = Field(
-        description="Nombre de personnes indiqué dans le texte."
-    )
-
-    duree_preparation: str = Field(
-        description="Durée de préparation indiquée dans le texte."
-    )
-
-    duree_cuisson: str = Field(
-        description="Durée de cuisson indiquée dans le texte."
-    )
-
-    duree_repos: str = Field(
-        description="Durée de repos indiquée dans le texte, ou chaîne vide si absente."
-    )
-
-    liste_ingredients: List[Ingredient] = Field( 
-        description=( 
-            "Liste structurée de tous les ingrédients mentionnés dans la section ingrédients. "
-            "Le champ 'ingredients' doit être une liste d'objets au format Ingredient: {nom, quantite}."
-            "Chaque élément contient un nom d’ingrédient et une quantité séparée."
-            "utilise uniquement les apostrophes typographiques ’ et non les apostrophes internes ' dans les phrases  ")
-    )
-
-    instructions: List[str] = Field(
-        description="Étapes de préparation générales (section 'LA RECETTE'), en incluant les éléments listés dans la section PRÉPARATION AU ROBOT." )
-    
-    etapes_companion: List[str] = Field(
-        description=(
-            "Étapes spécifiques au robot Companion extraites du tableau : "
-            "pour chaque ligne du tableau où la première colonne contient une étape, "
-            "combiner le texte de la première colonne avec l'instruction de la colonne 'Companion'. "
-            "Ignorer les lignes vides mais inclure les lignes d'accessoires. "
-            "Si le tableau ne contient pas de colonne 'Companion', renvoyer ['néant']."
-            "utilise uniquement les apostrophes typographiques ’ et non les apostrophes internes ' dans les phrases "
-        )
-    )
-
-    astuce: str = Field(
-        description="Conseils ou remarques éventuelles extraits du texte."
-    )
-    
-class Facture(BaseModel):
-    lien_fichier: str
-    numero_facture: str
-    fournisseur: str
-    date: str
-    montant_total: str
-    lignes: List[str]
-
-# Registre global des schémas disponibles
-SCHEMAS: Dict[str, Type[BaseModel]] = {
-    "Recette": Recette,
-    "Facture": Facture,
-}
+# --- Schémas Pydantic ---
+# Les modèles `Ingredient`, `Recette`, `Facture` et le registre `SCHEMAS`
+# sont désormais définis dans `services.schema`.
+#
+# Anciennes définitions locales (maintenues en commentaire pour historique) :
+#
+# class Ingredient(BaseModel):
+#     ingredient: str = Field(description="Nom de l’ingrédient, sans quantité.")
+#     quantite: str = Field(description="Quantité associée à l’ingrédient; répond non précisé si aucune quantité n'est mentionnée.")
+#     unite : str = Field(description="Unité associée à l’ingrédient; répond par une chaine de caractèrevide si aucune unité n'est mentionnée.")
+#
+#
+# class Recette(BaseModel):
+#     lien_fichier: str = Field(
+#         description="Chemin ou nom du fichier source."
+#     )
+#
+#     nom_recette: str = Field(
+#         description="Nom exact de la recette tel qu'indiqué dans le texte."
+#     )
+#
+#     nombre_personnes: int = Field(
+#         description="Nombre de personnes indiqué dans le texte."
+#     )
+#
+#     duree_preparation: str = Field(
+#         description="Durée de préparation indiquée dans le texte."
+#     )
+#
+#     duree_cuisson: str = Field(
+#         description="Durée de cuisson indiquée dans le texte."
+#     )
+#
+#     duree_repos: str = Field(
+#         description="Durée de repos indiquée dans le texte, ou chaîne vide si absente."
+#     )
+#
+#     liste_ingredients: List[Ingredient] = Field( 
+#         description=( 
+#             "Liste structurée de tous les ingrédients mentionnés dans la section ingrédients. "
+#             "Le champ 'ingredients' doit être une liste d'objets au format Ingredient: {nom, quantite}."
+#             "Chaque élément contient un nom d’ingrédient et une quantité séparée."
+#             "utilise uniquement les apostrophes typographiques ’ et non les apostrophes internes ' dans les phrases  ")
+#     )
+#
+#     instructions: List[str] = Field(
+#         description="Étapes de préparation générales (section 'LA RECETTE'), en incluant les éléments listés dans la section PRÉPARATION AU ROBOT." )
+#    
+#     etapes_companion: List[str] = Field(
+#         description=(
+#             "Étapes spécifiques au robot Companion extraites du tableau : "
+#             "pour chaque ligne du tableau où la première colonne contient une étape, "
+#             "combiner le texte de la première colonne avec l'instruction de la colonne 'Companion'. "
+#             "Ignorer les lignes vides mais inclure les lignes d'accessoires. "
+#             "Si le tableau ne contient pas de colonne 'Companion', renvoyer ['néant']."
+#             "utilise uniquement les apostrophes typographiques ’ et non les apostrophes internes ' dans les phrases "
+#         )
+#     )
+#
+#     astuce: str = Field(
+#         description="Conseils ou remarques éventuelles extraits du texte."
+#     )
+#     
+# class Facture(BaseModel):
+#     lien_fichier: str
+#     numero_facture: str
+#     fournisseur: str
+#     date: str
+#     montant_total: str
+#     lignes: List[str]
+#
+# # Registre global des schémas disponibles
+# SCHEMAS: Dict[str, Type[BaseModel]] = {
+#     "Recette": Recette,
+#     "Facture": Facture,
+# }
 
 
 # =========================================================

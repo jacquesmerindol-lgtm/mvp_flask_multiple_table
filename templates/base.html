@@ -50,6 +50,9 @@
             <div class="collapse navbar-collapse" id="navbarMain">
 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">📈 Tableau de bord</a>
+                    </li>
 
                     {# --------------------------------------------------------- #}
                     {# FONCTIONS MÉTIER                                          #}
@@ -94,6 +97,10 @@
                             📊 États / Synthèses
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navStates">
+
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.index') }}">
+                                📈 Tableau de bord
+                            </a></li>
 
                             <li><a class="dropdown-item" href="{{ url_for('courses.index') }}">
                                 🧾 Historique des listes de courses
