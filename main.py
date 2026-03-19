@@ -12,7 +12,7 @@ from routes.recettes import recettes_bp
 from routes.courses import courses_bp
 from routes.dashboard import dashboard_bp
 
-from routes.entity import entity_bp
+# from routes.entity import entity_bp
 from routes.ocr import bp as ocr_bp
 from routes.recettes_ui import ingredients_bp
 from routes.recettes_ui_simple import ingredients_bp_simple
@@ -63,7 +63,7 @@ def create_app():
     # Enregistrement des blueprints
     app.register_blueprint(livres_bp)
     app.register_blueprint(recettes_bp)
-    app.register_blueprint(entity_bp)
+    # app.register_blueprint(entity_bp)
     app.register_blueprint(debug_livres_bp) 
     app.register_blueprint(debug_recettes_bp)
     app.register_blueprint(ocr_bp) # ← obligatoire

@@ -19,6 +19,7 @@ from app.config import get_settings
 
 from datetime import date
 import json
+import ast
 
 courses_bp = Blueprint("courses", __name__, url_prefix="/courses")
 
@@ -67,7 +68,7 @@ def create():
 
     if form.validate_on_submit():    
         # textfield envoit une list mais dans une string (WTForms est un textfield), il faut remplacer les ' dans python par des " dans JSON pour appler le json.loads et avoir une liste dans SQLAlchemy
-        # --- Parsing JSON sécurisé ---
+        # --- Parsing JSON sécurisé ---# Debug print
         try :
             liste_recette_raw = form.liste_recette.data or []
             liste_recette_list = json.loads(liste_recette_raw.replace("'", '"'))
@@ -80,6 +81,8 @@ def create():
             "liste_recette": liste_recette_list, #envoyer une liste pour SQLAlchemy 
             "liste_course": form.liste_course.data or None
         }
+
+        print("DATA REÇUE EN CREATE UI :", data)  # Debug print
 
         with get_db() as db:
             try:

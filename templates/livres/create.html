@@ -81,8 +81,8 @@
 
             {{ render_form(
                 form,
-                action=form_config.url,
-                method=form_config.method
+                action=url_for("livres.create"),
+                method='POST'
             ) }}
 
           </div>

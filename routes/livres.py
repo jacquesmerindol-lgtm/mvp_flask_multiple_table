@@ -22,10 +22,11 @@ def index():
     form_search = LivreSearchForm(request.args)
 
     sort = request.args.get("sort", "id_livre")
+    # sort = request.args.get("sort", "position")  # Tri par défaut sur "position"
     order = request.args.get("order", "asc")
 
     # Whitelist de tri (optionnel mais recommandé)
-    allowed_sort = {"id_livre", "nom_livre", "numero_livre", "periode_recettes", "nom_robot"}
+    allowed_sort = {"position", "id_livre", "nom_livre", "numero_livre", "periode_recettes", "nom_robot"}
     if sort not in allowed_sort:
         sort = "id_livre"
 

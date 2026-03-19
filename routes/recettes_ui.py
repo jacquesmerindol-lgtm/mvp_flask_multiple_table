@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from services.list_course.crud import get_recettes_filtered, get_recettes_by_ids
 from services.list_course.logic import build_selection_pydantic, build_recette_map
-from services.schema import Recette, ListeRecetteSelection, RecetteQuantifiee
+from services.schema import Recette, ListeRecetteSelection, RecetteQuantifiee, ListeRecetteQuantifiee
 from services.list_course.redis_store import (
     get_list_course_selection,
     save_list_course_selection,
@@ -25,7 +25,7 @@ def select_ui():
 
         enriched = get_list_course_selection(user_id)
 
-        minimal = ListeRecetteSelection(
+        minimal = ListeRecetteQuantifiee(
             items=[
                 RecetteQuantifiee(id_recette=item.id_recette, nb_recette=item.nb_recette)
                 for item in enriched.recette_selection_items
@@ -40,7 +40,7 @@ def select_ui():
             nb_new: int = int(request.form.get(f"nb_recette_{rid}", 1))
             nb_map[rid] = nb_map.get(rid, 0) + nb_new
 
-        minimal = ListeRecetteSelection(
+        minimal = ListeRecetteQuantifiee(
             items=[
                 RecetteQuantifiee(id_recette=k, nb_recette=v)
                 for k, v in nb_map.items()
