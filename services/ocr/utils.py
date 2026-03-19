@@ -1,7 +1,7 @@
 # services/ocr/utils.py
 
-from database import get_db
-from models import Livre
+from app.database import get_db
+from app.models import Livre
 
 def get_livres_choices():
     """

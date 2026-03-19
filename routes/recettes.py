@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 
-from database import get_db
-from crud import recette_crud, livre_crud
+from app.database import get_db
+from app.crud import recette_crud, livre_crud
 from forms.recette_forms import (
     RecetteCreateForm,
     RecetteUpdateForm,
@@ -10,9 +10,9 @@ from forms.recette_forms import (
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import asc, desc
-from models import Recette
+from app.models import Recette
 
-from config import get_settings
+from app.config import get_settings
 settings = get_settings()
 
 import ast

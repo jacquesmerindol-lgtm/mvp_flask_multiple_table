@@ -1,7 +1,7 @@
 from flask import Flask, render_template, make_response, request
 
-from config import get_settings
-from database import Base, engine
+from app.config import get_settings
+from app.database import Base, engine
 
 # Blueprints
 # from routes.debug_livres import debug_livres_bp
@@ -12,10 +12,11 @@ from routes.recettes import recettes_bp
 from routes.courses import courses_bp
 from routes.dashboard import dashboard_bp
 
-from services.ocr.routes import bp as ocr_bp
-from services.list_course.routes import ingredients_bp
-from services.list_ingredients_simple.routes import ingredients_bp_simple
-from services.list_course.routes import list_course_bp
+from routes.entity import entity_bp
+from routes.ocr import bp as ocr_bp
+from routes.recettes_ui import ingredients_bp
+from routes.recettes_ui_simple import ingredients_bp_simple
+from routes.list_courses import list_course_bp
 
 
 # Importer les formulaires pour que render_form() fonctionne
@@ -62,6 +63,7 @@ def create_app():
     # Enregistrement des blueprints
     app.register_blueprint(livres_bp)
     app.register_blueprint(recettes_bp)
+    app.register_blueprint(entity_bp)
     app.register_blueprint(debug_livres_bp) 
     app.register_blueprint(debug_recettes_bp)
     app.register_blueprint(ocr_bp) # ← obligatoire

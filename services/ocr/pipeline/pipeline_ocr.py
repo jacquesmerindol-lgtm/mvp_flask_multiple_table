@@ -13,9 +13,7 @@ from flask import request
 # from services.ocr.ocr_processor import PaddleOCRProcessor
 from services.service_instance import ocr_processor
 from services.schema import OCRResults
-from app.redis_client import redis_client  # si tu as un client Redis
-
-import json
+from services.ocr.redis_store import save_ocr_input, save_ocr_output
 
 
 # ---------------------------------------------------------------------------
@@ -114,16 +112,8 @@ def run_pipeline_ocr(files, use_llm: bool = True) -> OCRResults:
     results: OCRResults = ocr_processor.run(paths)
     # return ocr_processor.run(paths)
 
-    # 5. Stockage dans Redis (stateless)    
-    redis_client.set(
-        f"ocr:{user_id}:input",
-        json.dumps(paths)  # ou autre format
-    )
-
-
-    redis_client.set(
-        f"ocr:{user_id}:output",
-        results.model_dump_json()
-    )
+    # 5. Stockage dans Redis (stateless)
+    save_ocr_input(user_id, paths)
+    save_ocr_output(user_id, results)
 
     return results

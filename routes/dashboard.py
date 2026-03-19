@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 
-from database import get_db
-from models import Recette, Course, Livre
+from app.database import get_db
+from app.models import Recette, Course, Livre
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload, load_only
 

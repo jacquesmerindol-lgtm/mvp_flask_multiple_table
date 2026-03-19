@@ -1,7 +1,7 @@
 # services/ocr/pipeline/pipeline_save_db.py
 
-from database import get_db
-from crud import recette_crud
+from app.database import get_db
+from app.crud import recette_crud
 from services.ocr.structuration import Recette  # modèle Pydantic
 
 

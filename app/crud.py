@@ -2,7 +2,7 @@ from typing import TypeVar, Generic, List, Optional, Type
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from models import Livre, Recette, Course
+from app.models import Livre, Recette, Course
 
 T = TypeVar("T")
 

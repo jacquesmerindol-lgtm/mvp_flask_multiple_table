@@ -3,44 +3,33 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from services.list_ingredients_simple.crud import (
     get_recettes_filtered,
     get_recettes_by_ids,
-    get_recettes_full_by_ids,
 )
 from services.list_ingredients_simple.logic import build_recette_map, build_selection_pydantic
+
 
 ingredients_bp_simple = Blueprint(
     "recettes_ui_simple",
     __name__,
-    url_prefix="/ingredients_simple"
+    url_prefix="/ingredients_simple",
 )
 
 
-# ----------------------------------------------------------------------
-# PAGE DE SÉLECTION SIMPLE (GET + POST)
-# ----------------------------------------------------------------------
 @ingredients_bp_simple.route("/select", methods=["GET", "POST"])
 def select_ui():
-
-    # ------------------------------------------------------------------
-    # POST : sélection simple (ajout sans doublons)
-    # ------------------------------------------------------------------
     if request.method == "POST":
         selected_ids = request.form.getlist("selected_recettes")
 
         if not selected_ids:
             return redirect(url_for("recettes_ui_simple.select_ui"))
 
-        # Récupérer la sélection existante
         current_ids = session.get("liste_recettes_simple", [])
 
-        # Ajouter uniquement les nouveaux IDs (pas de doublons)
         for rid in selected_ids:
             if rid not in current_ids:
                 current_ids.append(rid)
 
-        # Sauvegarde
         session["liste_recettes_simple"] = current_ids
 
-        # Rechargement pour affichage
         recettes = get_recettes_by_ids(current_ids)
         recette_map = build_recette_map(recettes)
 
@@ -50,9 +39,6 @@ def select_ui():
             recette_map=recette_map,
         )
 
-    # ------------------------------------------------------------------
-    # GET : affichage + filtres + persistance
-    # ------------------------------------------------------------------
     selected_ids = session.get("liste_recettes_simple", [])
 
     f_periode = request.args.get("periode")
@@ -91,14 +77,10 @@ def select_ui():
     )
 
 
-# ----------------------------------------------------------------------
-# PAGE DE RÉSULTAT (suppression simple)
-# ----------------------------------------------------------------------
 @ingredients_bp_simple.route("/select/update", methods=["GET", "POST"])
 def update_selection():
     selected_ids = session.get("liste_recettes_simple", [])
 
-    # POST : suppression
     if request.method == "POST":
         rid_to_delete = request.form.get("delete")
         if rid_to_delete:
@@ -106,7 +88,6 @@ def update_selection():
             session["liste_recettes_simple"] = selected_ids
             return redirect(url_for("recettes_ui_simple.update_selection"))
 
-    # GET : affichage
     recettes = get_recettes_by_ids(selected_ids)
     recette_map = build_recette_map(recettes)
 
@@ -117,9 +98,6 @@ def update_selection():
     )
 
 
-# ----------------------------------------------------------------------
-# EXPORT POUR LLM (sans nb_recette)
-# ----------------------------------------------------------------------
 @ingredients_bp_simple.route("/select/export")
 def export_for_llm():
     selected_ids = session.get("liste_recettes_simple", [])

@@ -1,16 +1,18 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
-from database import get_db
-from models import Entity
-from crud import entity_crud
+
+from app.database import get_db
+from app.models import Entity
+from app.crud import entity_crud
 from forms.entity_forms import (
     EntityCreateForm,
     EntityUpdateForm,
     EntityDeleteForm,
-    EntitySearchForm
+    EntitySearchForm,
 )
 from sqlalchemy import asc, desc
 
 entity_bp = Blueprint("entity", __name__, url_prefix="/entity")
+
 
 @entity_bp.route("/", methods=["GET"])
 def index():
@@ -42,8 +44,9 @@ def index():
         "entity/index.html",
         items=items,
         form_search=form_search,
-        form_delete=form_delete
+        form_delete=form_delete,
     )
+
 
 @entity_bp.route("/create", methods=["GET", "POST"])
 def create():
@@ -52,7 +55,7 @@ def create():
     if form.validate_on_submit():
         data = {
             "champ1": form.champ1.data,
-            "champ2": form.champ2.data
+            "champ2": form.champ2.data,
         }
 
         with get_db() as db:
@@ -61,6 +64,7 @@ def create():
             return redirect(url_for("entity.index"))
 
     return render_template("entity/create.html", form=form)
+
 
 @entity_bp.route("/<int:id_entity>", methods=["GET"])
 def detail(id_entity):
@@ -74,8 +78,9 @@ def detail(id_entity):
         "entity/detail.html",
         item=item,
         form_edit=form_edit,
-        form_delete=form_delete
+        form_delete=form_delete,
     )
+
 
 @entity_bp.route("/<int:id_entity>/update", methods=["POST"])
 def update_ui(id_entity):
@@ -87,7 +92,7 @@ def update_ui(id_entity):
         if form.validate_on_submit():
             data = {
                 "champ1": form.champ1.data,
-                "champ2": form.champ2.data
+                "champ2": form.champ2.data,
             }
 
             entity_crud.update(db, item, data)
@@ -95,6 +100,7 @@ def update_ui(id_entity):
             return redirect(url_for("entity.detail", id_entity=id_entity))
 
     return render_template("entity/edit.html", form=form, item=item)
+
 
 @entity_bp.route("/<int:id_entity>/delete", methods=["POST"])
 def delete_ui(id_entity):

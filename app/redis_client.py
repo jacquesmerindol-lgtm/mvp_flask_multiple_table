@@ -1,6 +1,6 @@
 # redis_client.py
 from redis import Redis
-from config import get_settings
+from app.config import get_settings
 
 settings = get_settings()
 

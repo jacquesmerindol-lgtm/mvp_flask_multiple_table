@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import IntegrityError
-from database import get_db
+from app.database import get_db
 
 
 def make_debug_blueprint(name: str, crud):

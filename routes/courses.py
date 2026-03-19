@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 
-from database import get_db
-from crud import course_crud    
+from app.database import get_db
+from app.crud import course_crud
 
 from forms.course_form import (
     CourseCreateForm,
@@ -12,10 +12,10 @@ from forms.course_form import (
 
 from sqlalchemy.exc import IntegrityError
 
-from models import Course
+from app.models import Course
 from sqlalchemy import asc, desc
 
-from config import get_settings
+from app.config import get_settings
 
 from datetime import date
 import json

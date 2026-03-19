@@ -1,5 +1,5 @@
-from database import get_db
-from models import Livre, Recette
+from app.database import get_db
+from app.models import Livre, Recette
 
 def get_recettes_filtered(
     periode: str | None = None,

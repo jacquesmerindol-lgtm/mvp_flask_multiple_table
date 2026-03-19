@@ -62,7 +62,10 @@ from flask import request
 #     return serviceListeCourse._output_model
 from flask import current_app
 from services.service_instance import serviceListeCourse
-from app.redis_client import redis_client
+from services.list_course.redis_store import (
+    save_list_course_input,
+    save_list_course_output,
+)
 
 def pipeline_liste_course(data: ListeRecetteSelection) -> ListeCourse:
     # # 🔥 Récupération du workflow_id global
@@ -72,18 +75,12 @@ def pipeline_liste_course(data: ListeRecetteSelection) -> ListeCourse:
     user_id = request.cookies.get("user_id")
 
     # Stockage input
-    redis_client.set(
-        f"courses:{user_id}:input",
-        data.model_dump_json()
-    )
+    save_list_course_input(user_id, data)
 
     # Appel du service stateless
     output = serviceListeCourse.run(data)
 
     # Stockage output
-    redis_client.set(
-        f"courses:{user_id}:output",
-        output.model_dump_json()
-    )
+    save_list_course_output(user_id, output)
 
     return output

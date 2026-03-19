@@ -3,9 +3,9 @@ from wtforms import (HiddenField, IntegerField,
                      SubmitField, DateField, TextAreaField
                     )
 from wtforms.validators import DataRequired
-from database import get_db
-from crud import course_crud
-from config import get_settings
+from app.database import get_db
+from app.crud import course_crud
+from app.config import get_settings
 
 settings = get_settings()
 

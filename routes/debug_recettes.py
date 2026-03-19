@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 
-from database import get_db
-from crud import recette_crud
+from app.database import get_db
+from app.crud import recette_crud
 
 debug_recettes_bp = Blueprint("debug_recettes", __name__, url_prefix="/debug/recettes")
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 
-from database import get_db
-from crud import livre_crud
+from app.database import get_db
+from app.crud import livre_crud
 from forms.livre_forms import (
     LivreCreateForm,
     LivreUpdateForm,
@@ -10,10 +10,10 @@ from forms.livre_forms import (
 )
 from sqlalchemy.exc import IntegrityError
 livres_bp = Blueprint("livres", __name__, url_prefix="/livres")
-from models import Livre
+from app.models import Livre
 from sqlalchemy import asc, desc
 
-from config import get_settings
+from app.config import get_settings
 
 settings = get_settings()
 

@@ -19,9 +19,11 @@
 
 # services/structuration/pipeline_structuration.py
 
-import json
 from flask import request
-from app.redis_client import redis_client
+from services.ocr.redis_store import (
+    save_ocr_structuration_input,
+    save_ocr_structuration_output,
+)
 from services.service_instance import structuration_processor
 from services.schema import OCRResults
 
@@ -40,10 +42,7 @@ def run_pipeline_structuration(ocr_results: OCRResults, schema_name="Recette"):
     user_id = request.cookies.get("user_id")
 
     # 2. Stockage input OCR
-    redis_client.set(
-        f"structuration:{user_id}:input",
-        ocr_results.model_dump_json()
-    )
+    save_ocr_structuration_input(user_id, ocr_results)
 
     # 3. Configuration dynamique du schéma
     structuration_processor.schema_name = schema_name
@@ -51,12 +50,7 @@ def run_pipeline_structuration(ocr_results: OCRResults, schema_name="Recette"):
     # 4. Exécution du service stateless
     structured_items = structuration_processor.run(ocr_results)
 
-    # 5. Conversion en JSON pour Redis
-    payload = [item.model_dump(mode="json") for item in structured_items]
-
-    redis_client.set(
-        f"structuration:{user_id}:output",
-        json.dumps(payload, ensure_ascii=False)
-    )
+    # 5. Sauvegarde du résultat structuré dans Redis
+    save_ocr_structuration_output(user_id, structured_items)
 
     return structured_items
